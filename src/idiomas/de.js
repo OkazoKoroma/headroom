@@ -428,6 +428,8 @@ module.exports = {
   "boton.tablero": "Übersicht (alle Diagramme)",
   "boton.mini": "Minimalansicht (ein Kreis)",
   "aj.sinBarras": "Nur Zahlen (Balken ausblenden)",
+  "aj.ocultarHoy": "Den Heute-Balken ausblenden",
+  "aj.ocultarHoy.ayuda": "Um nur die 5-Stunden-Sitzung und die Woche zu sehen. Die Hinweise zum Tageslimit bleiben aktiv; die kompakte und die minimale Ansicht zeigen die Sitzung.",
   "ayuda.hoy": "HEUTE: was du heute verbraucht hast ({hoy}% deines Wochenkontingents) im Vergleich zu deinem gewählten Tageslimit ({limite}%). Der Balken ist voll, wenn du dieses Limit erreichst. So verteilst du die Woche, statt sie in wenigen Tagen aufzubrauchen. Das Limit änderst du in den Einstellungen.",
   "ayuda.sesion": "5-STUNDEN-SITZUNG: das Limit deines Plans, das alle 5 Stunden zurückgesetzt wird. Bei 100% musst du auf die angezeigte Zurücksetzung warten.",
   "ayuda.semana": "WOCHE: wie viel vom Wochenkontingent deines Plans du verbraucht hast. Bei 100% musst du auf die wöchentliche Zurücksetzung warten.",

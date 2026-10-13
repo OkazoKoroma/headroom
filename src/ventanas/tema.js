@@ -26,6 +26,7 @@ function aplicarApariencia(apariencia) {
   document.body.classList.toggle('completo', modo === 'completo' || modo === 'tablero');
   document.body.classList.toggle('tablero', modo === 'tablero');
   document.body.classList.toggle('sin-barras', Boolean(apariencia.sinBarras)); // solo números: la tarjeta no dibuja las barras
+  document.body.classList.toggle('sin-hoy', Boolean(apariencia.ocultarHoy));    // sin la barra de Hoy
   document.body.classList.toggle('vista-cuentas', modo === 'cuentas');   // la vista "Cuentas" (todas a la vez, sin la tarjeta)
   document.body.classList.toggle('todas', Boolean(apariencia.todas));   // en vez de la tarjeta se ve la lista con todas las cuentas
   document.body.classList.toggle('horizontal', horizontal);

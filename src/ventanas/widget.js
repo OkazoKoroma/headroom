@@ -108,7 +108,7 @@ function dibujarLimitesExtra(extras) {
   const lista = extras || [];
   const contenedor = document.getElementById('extras');
   document.documentElement.style.setProperty('--n-extras', String(lista.length));
-  document.documentElement.style.setProperty('--n-medidores', String(3 + lista.length));
+  document.documentElement.style.setProperty('--n-medidores', String((document.body.classList.contains('sin-hoy') ? 2 : 3) + lista.length));
 
   // Si cambió la cantidad o los nombres, se arman de nuevo; si no, solo se actualizan los valores (así los números se animan).
   const firma = lista.map((e) => e.nombre).join('|');
@@ -184,11 +184,13 @@ function pintarMini(uso) {
   const relleno = document.getElementById('mini-relleno');
   const valor = document.getElementById('mini-valor');
   const boton = document.getElementById('mini-boton');
-  const proporcion = uso && uso.limiteDiario ? uso.hoy / uso.limiteDiario : 0;
+  // Con "ocultar la barra de Hoy", el anillo es el de la sesión de 5 horas (si hay una)
+  const deLaSesion = document.body.classList.contains('sin-hoy') && uso && uso.sesion5h;
+  const proporcion = deLaSesion ? uso.sesion5h.porcentaje / 100 : uso && uso.limiteDiario ? uso.hoy / uso.limiteDiario : 0;
   relleno.style.strokeDasharray = String(PERIMETRO_MINI);
   relleno.style.strokeDashoffset = String(PERIMETRO_MINI * (1 - Math.min(1, proporcion)));
-  relleno.style.stroke = uso ? colorDiario(proporcion) : 'transparent';
-  valor.textContent = uso ? `${formatear(Math.round(uso.hoy))}%` : '—';
+  relleno.style.stroke = uso ? (deLaSesion ? colorSemanal(proporcion) : colorDiario(proporcion)) : 'transparent';
+  valor.textContent = uso ? `${formatear(Math.round(deLaSesion ? uso.sesion5h.porcentaje : uso.hoy))}%` : '—';
   // Al pasar el mouse: todo el resumen
   boton.title = uso
     ? [
@@ -1548,7 +1550,7 @@ function aplicarAparienciaAnimada(apariencia) {
   // basta con actualizar eso, sin repintar el resto.
   const antes = aparienciaMostrada;
   const coloresIguales = antes !== null && JSON.stringify(apariencia.colores || null) === JSON.stringify(antes.colores || null);
-  const soloTamano = antes !== null && coloresIguales && ['tema', 'opacidad', 'modo', 'orientacion', 'escala', 'todas', 'formatoReinicio', 'sinBarras']
+  const soloTamano = antes !== null && coloresIguales && ['tema', 'opacidad', 'modo', 'orientacion', 'escala', 'todas', 'formatoReinicio', 'sinBarras', 'ocultarHoy']
     .every((clave) => apariencia[clave] === antes[clave]);
   // El formato del reinicio: se aplica al instante a todos los "Reinicio: ...".
   if (apariencia.formatoReinicio && apariencia.formatoReinicio !== formatoReinicio) {

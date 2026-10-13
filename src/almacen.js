@@ -30,6 +30,7 @@ const VALORES_INICIALES = {
   consultaRapida: false, // consultar cada 2 minutos mientras la sesión de 5 horas va sobre 70% (el resto del tiempo, el intervalo normal)
   avisoRitmoSemana: true, // avisar si a este ritmo agotarías la cuota semanal antes del reinicio
   sinBarras: false,    // "solo números": la tarjeta no dibuja las barras (queda más baja)
+  ocultarHoy: false,   // sin la barra de Hoy: solo la sesión de 5 horas, la semana y los límites por modelo
   seguirAClaude: false, // mostrar el widget al abrir Claude (la app o Claude Code) y ocultarlo al cerrarlo
   resumenes: true,     // avisar cuánto usaste ayer (al empezar el día) y en la semana (al reiniciarse)
   bienvenidaVista: false, // true cuando ya se mostró la bienvenida de la primera vez

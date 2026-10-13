@@ -428,6 +428,8 @@ module.exports = {
   "boton.tablero": "Dashboard (all the charts)",
   "boton.mini": "Minimal view (a circle)",
   "aj.sinBarras": "Numbers only (hide the bars)",
+  "aj.ocultarHoy": "Hide the Today bar",
+  "aj.ocultarHoy.ayuda": "To see only the 5-hour session and the week. Daily-limit alerts keep working; the compact and minimal views show the session.",
   "ayuda.hoy": "TODAY: what you have used today ({hoy}% of your weekly quota) against the daily limit you chose ({limite}%). The bar fills up when you reach that limit. It helps you spread the week instead of spending it in a few days. Change the limit in Settings.",
   "ayuda.sesion": "5-HOUR SESSION: your plan’s limit that resets every 5 hours. If it reaches 100%, you have to wait for the reset shown.",
   "ayuda.semana": "WEEK: how much of your plan’s weekly quota you have used. If it reaches 100%, you have to wait for the weekly reset.",

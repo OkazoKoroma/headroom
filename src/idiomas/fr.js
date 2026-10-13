@@ -428,6 +428,8 @@ module.exports = {
   "boton.tablero": "Tableau de bord (tous les graphiques)",
   "boton.mini": "Vue minimale (un cercle)",
   "aj.sinBarras": "Chiffres seulement (masquer les barres)",
+  "aj.ocultarHoy": "Masquer la barre Aujourd’hui",
+  "aj.ocultarHoy.ayuda": "Pour ne voir que la session de 5 heures et la semaine. Les alertes de la limite quotidienne continuent ; les vues compacte et minimale montrent la session.",
   "ayuda.hoy": "AUJOURD’HUI : ce que vous avez utilisé aujourd’hui ({hoy} % de votre quota hebdomadaire) par rapport à la limite quotidienne que vous avez choisie ({limite} %). La barre est pleine quand vous atteignez cette limite. Cela aide à répartir la semaine au lieu de la dépenser en quelques jours. La limite se change dans les Réglages.",
   "ayuda.sesion": "SESSION 5 H : la limite de votre forfait qui se réinitialise toutes les 5 heures. Si elle atteint 100 %, il faut attendre la réinitialisation indiquée.",
   "ayuda.semana": "SEMAINE : la part du quota hebdomadaire de votre forfait déjà utilisée. Si elle atteint 100 %, il faut attendre la réinitialisation hebdomadaire.",

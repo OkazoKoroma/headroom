@@ -143,6 +143,7 @@ const RESUMEN_RELLENO = 16;
 const RESUMEN_FILA = 22;
 let totalDeCuentas = 1; // cuántas cuentas hay (se actualiza al agregar o eliminar)
 let sinBarras = false; // ajuste "solo números": la tarjeta sin barras es más baja (ver AHORRO_SIN_BARRA_* y widget.css)
+let ocultarHoy = false; // ajuste "ocultar la barra de Hoy": la tarjeta vertical pierde un medidor; en la compacta y la mínima se ve la sesión
 const AHORRO_SIN_BARRA_VERTICAL = 13; // por cada medidor de la tarjeta vertical: la barra (10) y su separación (3)
 const AHORRO_SIN_BARRA_FRANJA = 15;   // en las vistas de franja (horizontal, completa y panel de control): la barra (9) y su separación (6)
 let verTodasLasCuentas = true; // ajuste: en la vista normal y la compacta, mostrar todas las cuentas a la vez (si hay más de una)
@@ -246,7 +247,7 @@ function alturaDeLosBloques() {
   return idsDeCuentas.reduce((suma, id) => {
     const lectura = lecturaDe(id);
     const conDatos = sesion.estadoDe(id) === 'conectado' && lectura.uso && !lectura.error;
-    return suma + (conDatos ? LISTA_BLOQUE + LISTA_FILA_EXTRA * limitesExtraDe(id).length : LISTA_BLOQUE_SIN_DATOS);
+    return suma + (conDatos ? LISTA_BLOQUE + LISTA_FILA_EXTRA * limitesExtraDe(id).length - (ocultarHoy ? LISTA_FILA_EXTRA : 0) : LISTA_BLOQUE_SIN_DATOS);
   }, 0);
 }
 
@@ -347,7 +348,8 @@ function medidasSinChats(w, vista) {
   if (!todasALaVez(w, vista) && vista.modo === 'normal') {
     if (vista.orientacion === 'vertical') {
       const porMedidor = sinBarras ? AHORRO_SIN_BARRA_VERTICAL : 0;
-      return { ...base, alto: base.alto - 3 * porMedidor + (ALTO_POR_LIMITE_EXTRA - porMedidor) * w.limitesExtra };
+      const medidoresExtra = w.limitesExtra - (ocultarHoy ? 1 : 0); // sin Hoy, un medidor menos
+      return { ...base, alto: base.alto - 3 * porMedidor + (ALTO_POR_LIMITE_EXTRA - porMedidor) * medidoresExtra };
     }
     return { ...base, ancho: base.ancho + ANCHO_POR_LIMITE_EXTRA * w.limitesExtra, alto: base.alto - (sinBarras ? AHORRO_SIN_BARRA_FRANJA : 0) };
   }
@@ -616,6 +618,7 @@ function aparienciaActual(w) {
     escala: Math.round(escalaActual * 100),
     todas: todasALaVez(w),             // true = en vez de la tarjeta se ve la lista con todas las cuentas
     sinBarras,                         // true = la tarjeta muestra solo los números, sin barras
+    ocultarHoy,                        // true = sin la barra de Hoy (la compacta y la mínima muestran la sesión)
     // cuánto estiraste la ventana de esta vista (la pantalla estira su contenido igual); en la vista completa cuenta también
     // lo que creció por tener muchas cuentas
     extra: { ...extrasDeVista(w), alto: extrasDeVista(w).alto + (esVistaCompleta(w.vista) && !w.parte ? extraDeCompletoPorCuentas() : 0) },
@@ -1259,6 +1262,7 @@ function guardarAjustes(w, datos) {
     consultaRapida: nuevos.consultaRapida,
     avisoRitmoSemana: nuevos.avisoRitmoSemana,
     sinBarras: nuevos.sinBarras,
+    ocultarHoy: nuevos.ocultarHoy,
     formatoReinicio: nuevos.formatoReinicio,
     colores: nuevos.colores,
     siempreEncima: nuevos.siempreEncima,
@@ -1273,9 +1277,10 @@ function guardarAjustes(w, datos) {
   // Tamaño del widget: se aplica al instante (el widget queda quieto en su borde más cercano de la pantalla).
   if (nuevos.escala !== Math.round(escalaActual * 100)) aplicarEscala(nuevos.escala);
 
-  // Solo números (sin barras): la tarjeta cambia de alto.
-  if (nuevos.sinBarras !== sinBarras) {
+  // Solo números (sin barras) y ocultar Hoy: la tarjeta cambia de alto.
+  if (nuevos.sinBarras !== sinBarras || nuevos.ocultarHoy !== ocultarHoy) {
     sinBarras = nuevos.sinBarras;
+    ocultarHoy = nuevos.ocultarHoy;
     reajustarTodas();
     for (const otra of todasLasVentanas()) enviarApariencia(otra);
   }
@@ -1938,6 +1943,7 @@ function anotarCurvasDeModelos(cuenta, limitesExtra) {
     const nombre = extra.nombre.slice(0, 30);
     const { guardado, comparacion } = calculo.seguirCurvaDeModelo(curvas[nombre], {
       porcentaje: extra.porcentaje, reinicioMs: extra.reinicio.getTime(), ahoraMs: fechaActual().getTime(),
+      historial: cuenta.historial, nombre,
     });
     delete curvas[nombre]; // (así el que se acaba de leer queda al final y no se pierde al recortar)
     curvas[nombre] = guardado;
@@ -2683,6 +2689,7 @@ if (!app.requestSingleInstanceLock()) {
     verTodasLasCuentas = almacen.leer().todasLasCuentas !== false;
     ventanasSeparadas = almacen.leer().ventanasSeparadas === true;
     sinBarras = almacen.leer().sinBarras === true;
+    ocultarHoy = almacen.leer().ocultarHoy === true;
     tamanosGuardados = almacen.leer().tamanos || {};
     await sesion.iniciar(cuentasGuardadas, alCambiarSesion, MODO_PRUEBA);
     idiomas.fijar(almacen.leer().idioma); // el idioma guardado, antes de crear el menú y las pantallas

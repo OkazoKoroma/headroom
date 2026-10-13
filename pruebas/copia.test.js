@@ -126,6 +126,13 @@ test('límite por modelo (Fable): se compara con su semana anterior a esta misma
   assert.deepStrictEqual(comparacion, { diferencia: 6, antes: 20, aproximado: false });
   assert.deepStrictEqual(guardado.puntos, [[48, 26]]);
   assert.strictEqual(guardado.pasada.reinicioMs, reinicio1);
+  // Si la curva de la semana pasada empezó a guardarse tarde, se estima con lo que el modelo usó cada día (aproximado)
+  const tarde = { reinicioMs: reinicio2, puntos: [], pasada: { reinicioMs: reinicio1, puntos: [[120, 50], [168, 70]] } };
+  const dias = [];
+  for (let n = 0; n < 7; n++) { const d = new Date(inicio1 + n * 24 * HORA); dias.push({ dia: d.toISOString().slice(0, 10), uso: 1, modelos: { Fable: 10 } }); }
+  ({ comparacion } = calculo.seguirCurvaDeModelo(tarde, { porcentaje: 30, reinicioMs: reinicio2, ahoraMs: reinicio1 + 48 * HORA, historial: dias, nombre: 'Fable' }));
+  assert.strictEqual(comparacion.aproximado, true);
+  assert.ok(Math.abs(comparacion.antes - 20) <= 5, 'unos 20 (dos días de 10): ' + comparacion.antes); // dos días de la semana anterior
   // Si se saltó una semana entera, la curva guardada ya no es la anterior: no se compara
   const reinicio4 = reinicio2 + 14 * 24 * HORA;
   ({ comparacion } = calculo.seguirCurvaDeModelo(guardado, { porcentaje: 5, reinicioMs: reinicio4, ahoraMs: reinicio4 - 6 * 24 * HORA }));

@@ -428,6 +428,8 @@ module.exports = {
   "boton.tablero": "Painel de controle (todos os gráficos)",
   "boton.mini": "Vista mínima (um círculo)",
   "aj.sinBarras": "Só números (ocultar as barras)",
+  "aj.ocultarHoy": "Ocultar a barra de Hoje",
+  "aj.ocultarHoy.ayuda": "Para ver só a sessão de 5 horas e a semana. Os avisos do limite diário continuam funcionando; as visualizações compacta e mínima mostram a sessão.",
   "ayuda.hoy": "HOJE: o que você usou hoje ({hoy}% da sua cota semanal) contra o limite diário que você escolheu ({limite}%). A barra se enche ao chegar a esse limite. Serve para distribuir a semana e não gastá-la em poucos dias. O limite se muda em Ajustes.",
   "ayuda.sesion": "SESSÃO 5 H: o limite do seu plano que reinicia a cada 5 horas. Se chegar a 100%, é preciso esperar o reinício indicado.",
   "ayuda.semana": "SEMANA: quanto você usou da cota semanal do seu plano. Se chegar a 100%, é preciso esperar o reinício semanal.",

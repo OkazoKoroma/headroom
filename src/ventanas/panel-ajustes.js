@@ -39,6 +39,7 @@ const panelAjustes = (() => {
   const campoResumenes = document.getElementById('resumenes');
   const campoSeguirAClaude = document.getElementById('seguirAClaude');
   const campoSinBarras = document.getElementById('sinBarras');
+  const campoOcultarHoy = document.getElementById('ocultarHoy');
   const campoConsultaRapida = document.getElementById('consultaRapida');
   const campoRitmoSemana = document.getElementById('avisoRitmoSemana');
   const campoActualizaciones = document.getElementById('buscarActualizaciones');
@@ -220,6 +221,7 @@ const panelAjustes = (() => {
     campoResumenes.checked = actuales.resumenes;
     campoSeguirAClaude.checked = actuales.seguirAClaude;
     campoSinBarras.checked = actuales.sinBarras;
+    campoOcultarHoy.checked = actuales.ocultarHoy === true;
     campoConsultaRapida.checked = actuales.consultaRapida;
     campoRitmoSemana.checked = actuales.avisoRitmoSemana;
     campoActualizaciones.checked = actuales.buscarActualizaciones;
@@ -308,6 +310,7 @@ const panelAjustes = (() => {
       resumenes: campoResumenes.checked,
       seguirAClaude: campoSeguirAClaude.checked,
       sinBarras: campoSinBarras.checked,
+      ocultarHoy: campoOcultarHoy.checked,
       consultaRapida: campoConsultaRapida.checked,
       avisoRitmoSemana: campoRitmoSemana.checked,
       buscarActualizaciones: campoActualizaciones.checked,

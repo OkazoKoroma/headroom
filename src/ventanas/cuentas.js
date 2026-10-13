@@ -199,7 +199,7 @@ const panelCuentas = (() => {
     resumen.style.setProperty('--resumen-n', String(cuentas.length));
     // Columnas de las filas anchas: Hoy, Sesión, Semana y una más por cada límite extra (Fable...) de la cuenta que más tenga
     const maximoExtras = cuentas.reduce((mayor, c) => Math.max(mayor, (c.extras || []).length), 0);
-    resumen.style.setProperty('--n-cols-lista', String(3 + maximoExtras));
+    resumen.style.setProperty('--n-cols-lista', String((document.body.classList.contains('sin-hoy') ? 2 : 3) + maximoExtras));
     document.body.classList.toggle('con-resumen', cuentas.length >= 2 && conResumen);
 
     for (const [id, elementos] of filasDelResumen) {

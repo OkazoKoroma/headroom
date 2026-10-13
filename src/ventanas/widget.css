@@ -2400,3 +2400,35 @@ body.completo:not(.ajustes-abierto) #vista-proyeccion .proyeccion-detalle {
 .tablero-celda .est-mapa-hora {
   font-size: 8px;
 }
+
+/* ----- Ocultar la barra de Hoy: la tarjeta y la lista muestran solo la sesión, la semana y los límites por modelo ----- */
+body.sin-hoy #vista-datos > .medidor:first-child,
+body.sin-hoy .resumen-fila .resumen-medidor:first-of-type {
+  display: none;
+}
+
+/* La tarjeta vertical pierde un medidor (38 px; 25 sin barras) */
+body.sin-hoy:not(.compacto):not(.franja):not(.mini) .tarjeta {
+  height: calc(116px + 38px * var(--n-extras, 0) + var(--extra-alto, 0px));
+}
+
+body.sin-hoy.sin-barras:not(.compacto):not(.franja):not(.mini) .tarjeta {
+  height: calc(90px + 25px * var(--n-extras, 0) + var(--extra-alto, 0px));
+}
+
+/* Vista compacta: en vez de Hoy se ve la sesión de 5 horas (en la tarjeta y en la lista) */
+body.sin-hoy.compacto #vista-datos .medidor:nth-child(2) {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  column-gap: 12px;
+}
+
+body.sin-hoy.todas.compacto .resumen-medidor:nth-of-type(2) {
+  display: grid;
+}
+
+/* Lista vertical: cada bloque tiene una barra menos */
+body.sin-hoy.todas:not(.compacto):not(.horizontal):not(.vista-cuentas) .resumen-fila:not(.sin-datos) {
+  height: calc(59px + 19px * var(--n-extras-fila, 0));
+}

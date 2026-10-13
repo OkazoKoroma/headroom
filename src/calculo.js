@@ -504,7 +504,9 @@ function compararConSemanaPasada({ semana, inicioSemana, ahora, curvaPasada, his
 //   guardado → { reinicioMs, puntos, pasada: { reinicioMs, puntos } o null } de ese modelo (o nada si es la primera vez)
 // Devuelve { guardado, comparacion }: lo que hay que guardar ahora, y cómo va contra su semana anterior a esta misma altura
 // (comparacion es null mientras no haya una semana anterior guardada).
-function seguirCurvaDeModelo(guardado, { porcentaje, reinicioMs, ahoraMs }) {
+// "historial" y "nombre" (opcionales): si la curva de la semana pasada no llega hasta este momento (por ejemplo, se empezó a
+// guardar a mitad de semana), se estima con lo que ese modelo usó cada día (historial[].modelos[nombre]), como la semana general.
+function seguirCurvaDeModelo(guardado, { porcentaje, reinicioMs, ahoraMs, historial = null, nombre = null }) {
   const horas = (ahoraMs - (reinicioMs - 7 * DIA_MS)) / HORA_MS;
   const sigue = Boolean(guardado) && Math.abs(reinicioMs - guardado.reinicioMs) <= 12 * HORA_MS;
   // Si la fecha de reinicio saltó, la semana de ese modelo terminó: su curva pasa a ser "la pasada"
@@ -512,7 +514,13 @@ function seguirCurvaDeModelo(guardado, { porcentaje, reinicioMs, ahoraMs }) {
   const puntos = agregarALaCurva(sigue ? guardado.puntos : [], horas, porcentaje);
   // La pasada sirve solo si es la semana justo anterior (terminó cuando empezó esta)
   const sirve = pasada && Math.abs(pasada.reinicioMs - (reinicioMs - 7 * DIA_MS)) < 12 * HORA_MS;
-  return { guardado: { reinicioMs, puntos, pasada }, comparacion: sirve ? compararConCurva(porcentaje, pasada.puntos, horas) : null };
+  let comparacion = sirve ? compararConCurva(porcentaje, pasada.puntos, horas) : null;
+  if (!comparacion && Array.isArray(historial) && nombre && Number.isFinite(porcentaje)) {
+    const porDia = historial.map((d) => ({ dia: d.dia, uso: d.modelos && Number.isFinite(d.modelos[nombre]) ? d.modelos[nombre] : undefined }));
+    const antes = semanaPasadaSegunHistorial({ historial: porDia, inicioSemana: new Date(reinicioMs - 7 * DIA_MS), ahora: new Date(ahoraMs) });
+    if (antes !== null) comparacion = { diferencia: Math.round((porcentaje - antes) * 10) / 10, antes: Math.round(antes * 10) / 10, aproximado: true };
+  }
+  return { guardado: { reinicioMs, puntos, pasada }, comparacion };
 }
 
 module.exports = {
