@@ -29,7 +29,7 @@ The screenshots use **simulated data** (10 days of made-up usage) to show everyt
 
 ![Full view with one account](docs/captura-completo-una.png)
 
-**Dashboard.** Everything at once: the full view plus a row of tiles with your numbers (highest day, average, streak, suggested limit...) and eight charts, each on its own card: today hour by hour, the last 30 days, by day of the week, the day-and-hour map, usage by product (today, this week and week by week) and your busiest hours. It adapts to whatever size you give it:
+**Dashboard.** Everything at once: the full view plus the charts in three groups (Today; Week and month; Habits), each with its own number: hour by hour, by product, busiest hours, last 30 days, week by week, by day of the week and the day-and-hour map. It adapts to whatever size you give it:
 
 ![Dashboard with one account](docs/captura-panel.png)
 
@@ -111,7 +111,7 @@ The screenshots use **simulated data** (10 days of made-up usage) to show everyt
 - **One-click update** when a new version is out: it downloads, installs and reopens by itself.
 
 ### Views and look
-- Views go from least to most information: **Minimal** (a circle with a ring that fills up with today's usage), **Compact** (one line with the bars), **Normal** (the card, vertical or horizontal; panels open from their icons), **Full** (the card with history, breakdown and projection in view) and **Dashboard** (everything, plus the tiles with your numbers and eight charts: today hour by hour, 30 days, by day of the week, the day-and-hour map, busiest hours, and usage by product for today, this week and week by week).
+- Views go from least to most information: **Minimal** (two rings: the week outside, the 5-hour session inside), **Compact** (one line with the three numbers and their thin bars), **Normal** (the card, vertical or horizontal: the big number first; panels open from the ⋯ button), **Full** (the numbers on top; the history large on the left; breakdown and projection on the right) and **Dashboard** (everything, with the charts in groups: hour by hour, by product, busiest hours, 30 days, week by week, by day of the week and the day-and-hour map).
 - **Accounts:** all your accounts in a list, one row per account.
 - **Each account in its own window** (optional): each one moves separately and has its own view.
 - **Parts in their own window:** the history, breakdown, projection, usage by product and context window can be moved out of the widget (button next to the X) and placed wherever you like. With several accounts, each one says which account it belongs to.

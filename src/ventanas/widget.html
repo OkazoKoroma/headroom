@@ -429,64 +429,75 @@
       </div>
     </section>
 
-    <!-- Panel de control: debajo de la vista completa, las fichas con los números y ocho gráficos en tarjetas (widget.js los dibuja) -->
+    <!-- Panel de control: debajo de la vista completa, los gráficos en tres grupos (Hoy; Semana y mes; Hábitos), cada uno
+         con su número (widget.js los dibuja) -->
     <section class="tablero-graficos" id="tablero" aria-label="Panel de control" data-i18n-aria="tablero.titulo">
-      <div class="est-fichas tablero-fichas" id="tablero-fichas"></div>
-      <div class="tablero-rejilla">
+      <div class="tablero-grupos">
+        <h3 class="tablero-grupo" data-i18n="tablero.grupo.hoy">Hoy</h3>
         <div class="tablero-celda">
           <div class="historial-opciones">
-            <h4 class="tablero-titulo" data-i18n="tablero.hoy">Hoy, hora a hora</h4>
+            <h4 class="tablero-titulo" data-i18n="tablero.hoy">Hora a hora</h4>
             <span class="historial-promedio" id="tablero-hoy-leyenda"></span>
           </div>
+          <div class="tablero-numero" id="tablero-hoy-numero"></div>
           <div class="grafico" id="tablero-hoy-grafico"><div class="columnas" id="tablero-hoy"></div></div>
         </div>
         <div class="tablero-celda">
           <div class="historial-opciones">
-            <h4 class="tablero-titulo" data-i18n="tablero.dias">Últimos 30 días</h4>
-            <span class="historial-promedio" id="tablero-dias-leyenda"></span>
-          </div>
-          <div class="grafico" id="tablero-dias-grafico"><div class="columnas" id="tablero-dias"></div></div>
-        </div>
-        <div class="tablero-celda">
-          <div class="historial-opciones">
-            <h4 class="tablero-titulo" data-i18n="est.porDia">Por día de la semana</h4>
-            <span class="historial-promedio" id="tablero-por-dia-leyenda"></span>
-          </div>
-          <div class="grafico" id="tablero-por-dia-grafico"><div class="columnas" id="tablero-por-dia"></div></div>
-        </div>
-        <div class="tablero-celda">
-          <div class="historial-opciones">
-            <h4 class="tablero-titulo" data-i18n="est.mapa">Cuándo usas más (día y hora)</h4>
-          </div>
-          <div class="est-mapa" id="tablero-mapa"></div>
-        </div>
-        <div class="tablero-celda">
-          <div class="historial-opciones">
-            <h4 class="tablero-titulo" data-i18n="tablero.prodHoy">Por producto: hoy</h4>
+            <h4 class="tablero-titulo" data-i18n="tablero.prodHoy">Por producto</h4>
             <span class="historial-promedio" id="tablero-prod-hoy-leyenda"></span>
           </div>
+          <div class="tablero-numero" id="tablero-prod-hoy-numero"></div>
           <div class="grafico" id="tablero-prod-hoy-grafico"><div class="columnas" id="tablero-prod-hoy"></div></div>
-        </div>
-        <div class="tablero-celda">
-          <div class="historial-opciones">
-            <h4 class="tablero-titulo" data-i18n="tablero.prodSemana">Por producto: esta semana</h4>
-            <span class="historial-promedio" id="tablero-prod-semana-leyenda"></span>
-          </div>
-          <div class="grafico" id="tablero-prod-semana-grafico"><div class="columnas" id="tablero-prod-semana"></div></div>
-        </div>
-        <div class="tablero-celda">
-          <div class="historial-opciones">
-            <h4 class="tablero-titulo" data-i18n="tablero.semanas">Por producto: semana a semana</h4>
-            <span class="historial-promedio" id="tablero-semanas-leyenda"></span>
-          </div>
-          <div class="grafico" id="tablero-semanas-grafico"><div class="columnas" id="tablero-semanas"></div></div>
         </div>
         <div class="tablero-celda">
           <div class="historial-opciones">
             <h4 class="tablero-titulo" data-i18n="tablero.horas">Horas de más uso</h4>
             <span class="historial-promedio" id="tablero-horas-leyenda"></span>
           </div>
+          <div class="tablero-numero" id="tablero-horas-numero"></div>
           <div class="grafico" id="tablero-horas-grafico"><div class="columnas" id="tablero-horas"></div></div>
+        </div>
+        <h3 class="tablero-grupo" data-i18n="tablero.grupo.semana">Semana y mes</h3>
+        <div class="tablero-celda">
+          <div class="historial-opciones">
+            <h4 class="tablero-titulo" data-i18n="tablero.dias">Últimos 30 días</h4>
+            <span class="historial-promedio" id="tablero-dias-leyenda"></span>
+          </div>
+          <div class="tablero-numero" id="tablero-dias-numero"></div>
+          <div class="grafico" id="tablero-dias-grafico"><div class="columnas" id="tablero-dias"></div></div>
+        </div>
+        <div class="tablero-celda">
+          <div class="historial-opciones">
+            <h4 class="tablero-titulo" data-i18n="tablero.prodSemana">Por producto, esta semana</h4>
+            <span class="historial-promedio" id="tablero-prod-semana-leyenda"></span>
+          </div>
+          <div class="tablero-numero" id="tablero-prod-semana-numero"></div>
+          <div class="grafico" id="tablero-prod-semana-grafico"><div class="columnas" id="tablero-prod-semana"></div></div>
+        </div>
+        <div class="tablero-celda">
+          <div class="historial-opciones">
+            <h4 class="tablero-titulo" data-i18n="tablero.semanas">Semana a semana</h4>
+            <span class="historial-promedio" id="tablero-semanas-leyenda"></span>
+          </div>
+          <div class="tablero-numero" id="tablero-semanas-numero"></div>
+          <div class="grafico" id="tablero-semanas-grafico"><div class="columnas" id="tablero-semanas"></div></div>
+        </div>
+        <h3 class="tablero-grupo" data-i18n="tablero.grupo.habitos">Hábitos</h3>
+        <div class="tablero-celda">
+          <div class="historial-opciones">
+            <h4 class="tablero-titulo" data-i18n="est.porDia">Por día de la semana</h4>
+            <span class="historial-promedio" id="tablero-por-dia-leyenda"></span>
+          </div>
+          <div class="tablero-numero" id="tablero-por-dia-numero"></div>
+          <div class="grafico" id="tablero-por-dia-grafico"><div class="columnas" id="tablero-por-dia"></div></div>
+        </div>
+        <div class="tablero-celda tablero-celda-ancha">
+          <div class="historial-opciones">
+            <h4 class="tablero-titulo" data-i18n="est.mapa">Cuándo usas más (día y hora)</h4>
+          </div>
+          <div class="tablero-numero" id="tablero-mapa-numero"></div>
+          <div class="est-mapa" id="tablero-mapa"></div>
         </div>
       </div>
     </section>
@@ -533,11 +544,14 @@
       <!-- Pestañita con el nombre de la cuenta que se muestra: al pulsarla se abre el panel de cuentas -->
       <button id="boton-cuenta" class="cuenta-pestana" data-panel="cuentas" type="button" aria-pressed="false"></button>
 
-      <!-- Modo mínimo: un anillo con el uso de hoy (contra tu límite) y el % en el centro. Clic en el centro: vista normal. -->
+      <!-- Modo mínimo: dos anillos (afuera la semana, adentro la sesión de 5 horas) y el % de la sesión en el centro.
+           Clic en el centro: vista normal. -->
       <div class="mini-circulo" id="mini">
         <svg class="mini-anillo" viewBox="0 0 64 64" aria-hidden="true">
-          <circle class="mini-riel" cx="32" cy="32" r="26"></circle>
-          <circle class="mini-relleno" id="mini-relleno" cx="32" cy="32" r="26"></circle>
+          <circle class="mini-riel" cx="32" cy="32" r="27"></circle>
+          <circle class="mini-relleno" id="mini-relleno" cx="32" cy="32" r="27"></circle>
+          <circle class="mini-riel" cx="32" cy="32" r="20"></circle>
+          <circle class="mini-relleno" id="mini-relleno-sesion" cx="32" cy="32" r="20"></circle>
         </svg>
         <button type="button" class="mini-boton" id="mini-boton" data-alternar="mini"><span id="mini-valor">—</span></button>
       </div>
@@ -550,9 +564,11 @@
           <div class="medidor-texto">
             <span class="etiqueta-con-boton">
               <span class="etiqueta" id="etiqueta-hoy" data-i18n="hoy.etiqueta">Hoy</span>
+              <span class="porcentaje solo-vertical" id="hoy-porcentaje"></span>
               <span class="comparacion" id="hoy-comparacion"></span>
-              </span>
+            </span>
             <span class="detalle" id="hoy-detalle"></span>
+            <span class="detalle solo-vertical" id="hoy-detalle-corto"></span>
           </div>
           <div class="barra"><div class="barra-relleno" id="relleno-hoy"></div></div>
         </div>
@@ -587,6 +603,10 @@
         <!-- Barra de herramientas: los íconos que despliegan paneles y cambian la vista. No arrastran la ventana, así se pueden pulsar. -->
         <div class="herramientas">
           <!-- Cuatro íconos despliegan un panel (historial, desglose, proyección y ajustes); los dos últimos cambian la vista. -->
+              <!-- "Más": despliega los íconos que no están siempre a la vista (los paneles, la compacta y la mínima) -->
+              <button id="boton-mas" class="boton-icono" type="button" title="Más" data-i18n-title="boton.mas" aria-label="Más opciones" data-i18n-aria="boton.mas" aria-pressed="false">
+                <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="currentColor"><circle cx="3.2" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="12.8" cy="8" r="1.5"/></svg>
+              </button>
               <button id="boton-historial" class="boton-icono" data-panel="historial" type="button" title="Uso de los últimos 7 días" data-i18n-title="boton.historial" aria-label="Ver el uso de los últimos 7 días" data-i18n-aria="boton.historialAria" aria-pressed="false">
                 <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 13.5v-4M8 13.5v-8M12.5 13.5v-11"/></svg>
               </button>

@@ -1,6 +1,6 @@
 {
   "name": "widget-uso-claude",
-  "version": "0.17.0",
+  "version": "0.19.0",
   "description": "Headroom: widget de escritorio para Windows que muestra el uso de tu plan de Claude y avisa antes de pasarte del lÃ­mite",
   "author": "Usuario",
   "main": "src/main.js",

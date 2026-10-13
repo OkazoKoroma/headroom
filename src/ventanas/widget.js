@@ -179,18 +179,24 @@ function tituloDeLaParte() {
 }
 
 // ----- Modo mínimo -----
-const PERIMETRO_MINI = 2 * Math.PI * 26;
+const PERIMETRO_MINI = 2 * Math.PI * 27;          // el anillo de afuera (la semana)
+const PERIMETRO_MINI_SESION = 2 * Math.PI * 20;   // el de adentro (la sesión de 5 horas)
 function pintarMini(uso) {
   const relleno = document.getElementById('mini-relleno');
   const valor = document.getElementById('mini-valor');
   const boton = document.getElementById('mini-boton');
-  // Con "ocultar la barra de Hoy", el anillo es el de la sesión de 5 horas (si hay una)
-  const deLaSesion = document.body.classList.contains('sin-hoy') && uso && uso.sesion5h;
-  const proporcion = deLaSesion ? uso.sesion5h.porcentaje / 100 : uso && uso.limiteDiario ? uso.hoy / uso.limiteDiario : 0;
+  // Afuera, la semana; adentro, la sesión de 5 horas (lo que se agota sin avisar). El número es el de la sesión
+  // (o el de la semana, si claude.ai no entregó una sesión activa).
+  const semana = uso ? uso.semana / 100 : 0;
   relleno.style.strokeDasharray = String(PERIMETRO_MINI);
-  relleno.style.strokeDashoffset = String(PERIMETRO_MINI * (1 - Math.min(1, proporcion)));
-  relleno.style.stroke = uso ? (deLaSesion ? colorSemanal(proporcion) : colorDiario(proporcion)) : 'transparent';
-  valor.textContent = uso ? `${formatear(Math.round(deLaSesion ? uso.sesion5h.porcentaje : uso.hoy))}%` : '—';
+  relleno.style.strokeDashoffset = String(PERIMETRO_MINI * (1 - Math.min(1, semana)));
+  relleno.style.stroke = uso ? colorSemanal(semana) : 'transparent';
+  const sesion = uso && uso.sesion5h ? uso.sesion5h.porcentaje / 100 : null;
+  const rellenoSesion = document.getElementById('mini-relleno-sesion');
+  rellenoSesion.style.strokeDasharray = String(PERIMETRO_MINI_SESION);
+  rellenoSesion.style.strokeDashoffset = String(PERIMETRO_MINI_SESION * (1 - Math.min(1, sesion || 0)));
+  rellenoSesion.style.stroke = sesion !== null ? colorSemanal(sesion) : 'transparent';
+  valor.textContent = uso ? `${formatear(Math.round(sesion !== null ? uso.sesion5h.porcentaje : uso.semana))}%` : '—';
   // Al pasar el mouse: todo el resumen
   boton.title = uso
     ? [
@@ -287,6 +293,8 @@ function pintarComparacion(c, donde = 'semana', contra = donde === 'semana' ? ''
   const textos = textosDeLaComparacion(c, contra);
   marca.textContent = textos ? textos.corto : '';
   marca.title = textos ? textos.frase : '';
+  if (textos) marca.dataset.vs = t(`comp.${contra}vs`); // "vs. semana pasada": lo muestra la tarjeta vertical
+  else delete marca.dataset.vs;
   marca.style.color = textos ? textos.tono : '';
 }
 
@@ -321,6 +329,9 @@ function mostrarUso(datos) {
     // Con error (o mientras carga) las barras quedan vacías y se explica qué pasa.
     pintarBarra('relleno-hoy', null);
     escribirDetalle('hoy-detalle', '—');
+    escribirDetalle('hoy-detalle-corto', '');
+    document.getElementById('hoy-porcentaje').textContent = '';
+    delete valoresMostrados['hoy-porcentaje'];
     pintarBarra('relleno-semana', null);
     pintarBarra('relleno-sesion', null);
     escribirDetalle('semana-detalle', error ? `⚠ ${error}` : t('lectura.cargando'), Boolean(error));
@@ -341,6 +352,12 @@ function mostrarUso(datos) {
   pintarBarra('relleno-hoy', (uso.hoy / uso.limiteDiario) * 100, colorDiario);
   document.getElementById('hoy-detalle').classList.remove('aviso');
   animarNumero('hoy-detalle', uso.hoy, (v) => t('hoy.de', { hoy: formatear(v), limite: formatear(uso.limiteDiario) }));
+  // La tarjeta vertical: el número grande aparte y, al lado, el límite y (si se puede estimar) a qué hora llegarías a él
+  animarNumero('hoy-porcentaje', uso.hoy, (v) => `${formatear(v)}%`);
+  const diaria = uso.proyeccion && uso.proyeccion.diaria;
+  escribirDetalle('hoy-detalle-corto', diaria && diaria.tipo === 'llegaras'
+    ? t('hoy.de.proy', { limite: formatear(uso.limiteDiario), hora: diaria.cuandoTexto })
+    : t('hoy.de.corto', { limite: formatear(uso.limiteDiario) }));
 
   // Semana: la barra, el porcentaje en número (junto a la etiqueta) y la hora de reinicio.
   pintarComparacion(uso.comparacion);
@@ -709,9 +726,53 @@ async function dibujarTablero() {
   dibujarProductosEn(productosHoy, lugar('prod-hoy'));
   dibujarProductosEn(productosSemana, lugar('prod-semana'));
   dibujarProductosEn(semanas, lugar('semanas'));
-  pintarFichas(numeros, document.getElementById('tablero-fichas'));
   pintarPorDiaDeSemana(numeros, lugar('por-dia'));
   pintarMapa(numeros, document.getElementById('tablero-mapa'));
+  pintarNumerosDelTablero({ hoy, horas, productosHoy, productosSemana, semanas, numeros });
+}
+
+// El número grande de cada gráfico del panel de control (y, en chico, qué es), con lo que ya se trajo para dibujarlo.
+function pintarNumerosDelTablero({ horas, productosHoy, productosSemana, semanas, numeros }) {
+  const porcentaje = (valor) => `${formatear(Math.round(valor * 10) / 10)}%`;
+  const poner = (id, grande, chico) => {
+    const sitio = document.getElementById(`tablero-${id}-numero`);
+    sitio.replaceChildren(crear('b', '', grande), crear('small', '', chico));
+  };
+  const faltan = (id) => poner(id, '—', t('est.faltan'));
+  const uso = ultimosDatos && ultimosDatos.uso;
+  // Hoy: cuánto llevas de tu límite
+  if (uso) poner('hoy', porcentaje(uso.hoy), t('hoy.de.corto', { limite: formatear(uso.limiteDiario) }));
+  else faltan('hoy');
+  // Por producto (hoy y esta semana): el que más usó
+  const mayor = (datos) => {
+    const candidatos = (datos && datos.productos ? datos.productos : []).filter((p) => !p.propio)
+      .map((p) => ({ nombre: nombreDeProducto(p), valor: [...p.puntos].reverse().find((punto) => punto[1] !== null) }))
+      .filter((p) => p.valor && p.valor[1] > 0);
+    return candidatos.sort((a, b) => b.valor[1] - a.valor[1])[0] || null;
+  };
+  for (const [id, datos] of [['prod-hoy', productosHoy], ['prod-semana', productosSemana], ['semanas', semanas]]) {
+    const top = mayor(datos);
+    if (top) poner(id, porcentaje(top.valor[1]), top.nombre);
+    else faltan(id);
+  }
+  // Horas de más uso: la hora pico de la cuenta que se muestra
+  const cuenta = horas && horas.cuentas && horas.cuentas[0];
+  const pico = cuenta && cuenta.dias > 0 && cuenta.horas.some((v) => v > 0) ? cuenta.horas.indexOf(Math.max(...cuenta.horas)) : -1;
+  if (pico >= 0) poner('horas', `${String(pico).padStart(2, '0')}–${String(pico + 1).padStart(2, '0')} h`, t('tablero.pico'));
+  else faltan('horas');
+  // Últimos 30 días: el promedio por día (y el más alto)
+  if (numeros.promedio !== null) poner('dias', porcentaje(numeros.promedio), `${t('tablero.porDia')}${numeros.masAlto ? ` · ${porcentaje(numeros.masAlto.uso)} ${t('tablero.masAlto')}` : ''}`);
+  else faltan('dias');
+  // Por día de la semana: tu día más alto (y la racha)
+  const valores = numeros.porDiaSemana || [];
+  const indice = valores.reduce((mejor, v, n) => (v !== null && (mejor < 0 || v > valores[mejor]) ? n : mejor), -1);
+  if (indice >= 0) poner('por-dia', nombreCortoDelDia(indice), `${t('tablero.diaMasAlto')} · ${t('est.racha').toLowerCase()}: ${t('est.dias', { n: numeros.racha })}`);
+  else faltan('por-dia');
+  // El mapa: a qué hora sueles agotar la sesión (y cuántas se agotaron)
+  if (numeros.sesiones) {
+    const hora = numeros.sesiones.horaTipica !== null ? `${String(numeros.sesiones.horaTipica).padStart(2, '0')}:00` : '—';
+    poner('mapa', hora, `${t('est.horaAgota').toLowerCase()} · ${t('est.sesiones').toLowerCase()}: ${numeros.sesiones.agotadas7} / ${numeros.sesiones.total7} ${t('est.en7')}`);
+  } else faltan('mapa');
 }
 
 // Pone cada elemento en su tamaño final: [[elemento, 'height' o 'width', valor], ...].
@@ -854,7 +915,7 @@ function dibujarLineas({ series, desde, hasta, marcas, limites, ahora = null, co
   }
 
   const anchoTotal = Math.max(140, contenedor.clientWidth || 260);
-  const altoTotal = Math.max(60, contenedor.clientHeight || 150);
+  const altoTotal = Math.max(44, contenedor.clientHeight || 150);
   // En un lugar grande (panel agrandado, panel de control a pantalla completa) las letras del gráfico crecen, hasta 1,5 veces
   const k = Math.min(1.5, Math.max(1, Math.min(anchoTotal / 400, altoTotal / 170)));
   const IZQ = Math.round(30 * k);
@@ -1646,6 +1707,18 @@ document.getElementById('boton-completo').addEventListener('click', () => {
   window.widget.alternarModo('completo');
 });
 // Los botones de la lista de cuentas (cuando se ven todas a la vez): hacen lo mismo que los de la tarjeta.
+// "Más" (⋯): muestra u oculta los íconos que no están siempre a la vista; pulsar cualquier otro ícono lo vuelve a cerrar
+const botonMas = document.getElementById('boton-mas');
+const cerrarMas = () => { document.body.classList.remove('mas-abierto'); botonMas.setAttribute('aria-pressed', 'false'); };
+botonMas.addEventListener('click', () => {
+  const abierto = document.body.classList.toggle('mas-abierto');
+  botonMas.setAttribute('aria-pressed', String(abierto));
+});
+document.querySelector('.herramientas').addEventListener('click', (evento) => {
+  const boton = evento.target.closest('.boton-icono');
+  if (boton && boton !== botonMas) cerrarMas();
+});
+
 for (const boton of document.querySelectorAll('[data-alternar]')) {
   boton.addEventListener('click', () => {
     if (boton.dataset.alternar === 'orientacion') window.widget.alternarOrientacion();

@@ -67,8 +67,8 @@ body.abajo .escena {
 
 .tarjeta {
   flex: none;
-  /* --extra-alto: lo que estiraste la ventana a lo alto; --n-extras: cuántos límites extra (como Fable) hay, 38 px cada uno */
-  height: calc(154px + 38px * var(--n-extras, 0) + var(--extra-alto, 0px));
+  /* --extra-alto: lo que estiraste la ventana a lo alto; --n-extras: cuántos límites extra (como Fable) hay, 46 px cada uno */
+  height: calc(184px + 46px * var(--n-extras, 0) + var(--extra-alto, 0px));
   padding: 38px 18px 14px;   /* arriba queda una fila para la cuenta y la barra de íconos */
   animation: entrada 0.65s var(--suave) both;
   transition: height 0.3s var(--suave), padding 0.3s var(--suave); /* 0,3 s = DURACION_TARJETA_MS en main.js */
@@ -369,7 +369,18 @@ body.franja .detalle .prefijo {
 }
 
 body.franja .barra {
-  height: 9px;
+  height: 5px;
+  border-radius: 3px;
+  box-shadow: none;
+}
+
+body.franja .barra-relleno {
+  border-radius: 3px;
+  box-shadow: none;
+}
+
+body.franja .porcentaje {
+  font-size: 15px;
 }
 
 /* Los íconos en una cuadrícula de 3 × 2, a la derecha */
@@ -2220,7 +2231,7 @@ body.sin-barras .tarjeta .medidor-texto {
 }
 
 body.sin-barras:not(.compacto):not(.franja):not(.mini) .tarjeta {
-  height: calc(115px + 25px * var(--n-extras, 0) + var(--extra-alto, 0px));
+  height: calc(160px + 38px * var(--n-extras, 0) + var(--extra-alto, 0px));
 }
 
 body.sin-barras.franja .tarjeta {
@@ -2409,11 +2420,11 @@ body.sin-hoy .resumen-fila .resumen-medidor:first-of-type {
 
 /* La tarjeta vertical pierde un medidor (38 px; 25 sin barras) */
 body.sin-hoy:not(.compacto):not(.franja):not(.mini) .tarjeta {
-  height: calc(116px + 38px * var(--n-extras, 0) + var(--extra-alto, 0px));
+  height: calc(138px + 46px * var(--n-extras, 0) + var(--extra-alto, 0px));
 }
 
 body.sin-hoy.sin-barras:not(.compacto):not(.franja):not(.mini) .tarjeta {
-  height: calc(90px + 25px * var(--n-extras, 0) + var(--extra-alto, 0px));
+  height: calc(122px + 38px * var(--n-extras, 0) + var(--extra-alto, 0px));
 }
 
 /* Vista compacta: en vez de Hoy se ve la sesión de 5 horas (en la tarjeta y en la lista) */
@@ -2431,4 +2442,734 @@ body.sin-hoy.todas.compacto .resumen-medidor:nth-of-type(2) {
 /* Lista vertical: cada bloque tiene una barra menos */
 body.sin-hoy.todas:not(.compacto):not(.horizontal):not(.vista-cuentas) .resumen-fila:not(.sin-datos) {
   height: calc(59px + 19px * var(--n-extras-fila, 0));
+}
+
+/* ----- Tarjeta vertical "limpia": el número manda, la barra es una línea fina (las medidas coinciden con main.js) -----
+   Cada medidor: arriba a la izquierda la etiqueta, debajo el número grande; a la derecha, la comparación y el detalle;
+   y al pie la barra. 40 px por medidor, 6 entre ellos. */
+.solo-vertical {
+  display: none;
+}
+
+body:not(.compacto):not(.franja):not(.mini) .tarjeta .medidor-texto {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: 12px 20px;
+  column-gap: 10px;
+  align-items: end;
+  height: 32px;
+  margin-bottom: 4px;
+}
+
+body:not(.compacto):not(.franja):not(.mini) .tarjeta .etiqueta-con-boton {
+  display: contents;
+}
+
+body:not(.compacto):not(.franja):not(.mini) .tarjeta .etiqueta {
+  grid-column: 1;
+  grid-row: 1;
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 1px;
+}
+
+body:not(.compacto):not(.franja):not(.mini) .tarjeta .porcentaje {
+  grid-column: 1;
+  grid-row: 2;
+  font-size: 20px;
+  line-height: 20px;
+  letter-spacing: -0.4px;
+  font-variant-numeric: tabular-nums;
+}
+
+body:not(.compacto):not(.franja):not(.mini) .tarjeta .comparacion {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  line-height: 12px;
+}
+
+/* "▼ 16% vs. semana pasada": aquí hay lugar para decir contra qué compara */
+body:not(.compacto):not(.franja):not(.mini) .tarjeta .comparacion[data-vs]::after {
+  content: ' ' attr(data-vs);
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+body:not(.compacto):not(.franja):not(.mini) .tarjeta .detalle {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: end;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 10.5px;
+  line-height: 14px;
+}
+
+/* Hoy: el número grande con su "de 32%" (y la hora a la que llegarías al límite) al lado; el "10% de 32%" de siempre se esconde */
+body:not(.compacto):not(.franja):not(.mini) .tarjeta .solo-vertical {
+  display: block;
+}
+
+body:not(.compacto):not(.franja):not(.mini) .tarjeta #hoy-detalle {
+  display: none;
+}
+
+body:not(.compacto):not(.franja):not(.mini) .tarjeta .barra {
+  height: 4px;
+  border-radius: 2px;
+  box-shadow: none;
+}
+
+body:not(.compacto):not(.franja):not(.mini) .tarjeta .barra-relleno {
+  border-radius: 2px;
+  box-shadow: none;
+}
+
+/* Sin barras: el medidor queda en sus 32 px de texto */
+body.sin-barras:not(.compacto):not(.franja):not(.mini) .tarjeta .medidor-texto {
+  margin-bottom: 0;
+}
+
+/* ===== Estilo "limpio" en toda la app (0.18.1): barras finas y planas, números protagonistas, títulos iguales en todas partes ===== */
+
+/* Barras: una línea fina y plana en todas las vistas y paneles (sin canal hundido, sin brillo ni destello) */
+.barra {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--riel-a);
+  box-shadow: none;
+}
+
+.barra-relleno {
+  border-radius: 2px;
+  background: var(--c);
+  box-shadow: none;
+}
+
+.barra-relleno::after {
+  display: none;
+}
+
+body.franja .barra,
+body.compacto .barra {
+  height: 5px;
+  border-radius: 3px;
+}
+
+.resumen-medidor .barra,
+.chat-fila .barra {
+  height: 4px;
+}
+
+/* Desglose: la barra repartida, más fina; los números, más grandes */
+.barra-total {
+  height: 8px;
+  border-radius: 4px;
+  gap: 1px;
+  box-shadow: none;
+}
+
+.barra-cuenta {
+  height: 6px;
+}
+
+.fila {
+  font-size: 12px;
+}
+
+.valor-producto {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Lista de cuentas: el número manda también aquí */
+.resumen-valor {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.resumen-etiqueta {
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+
+.resumen-nombre {
+  font-size: 12px;
+}
+
+/* Vista compacta: el "9% de 14%" como número */
+body.compacto .detalle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Ventana de contexto: el porcentaje de cada chat como número */
+.chat-porcentaje {
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Títulos de paneles y secciones: todos iguales (chicos, en mayúsculas, con aire) */
+.panel-cabecera h2,
+.titulo-vista,
+.tablero-titulo,
+.chats-titulo,
+.proyeccion-etiqueta,
+.est-ficha-titulo,
+.resumen-titulo {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Fichas del panel de control: el número con el mismo tamaño que en la tarjeta */
+.est-ficha-valor {
+  font-size: 20px;
+  letter-spacing: -0.4px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tarjetas de la proyección: borde de color más fino */
+.proyeccion {
+  border-left-width: 2px;
+  border-radius: 10px;
+}
+
+/* Íconos: sin saltos al pasar el mouse (solo cambian de color y fondo) */
+.boton-icono:hover {
+  transform: none;
+}
+
+.boton-icono:active {
+  transform: scale(0.95);
+}
+
+/* Números en columnas (historial, estadísticas, lista) alineados por dígitos */
+.grafico-dia text,
+.resumen-fila,
+.fila-cuenta {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Las fichas son angostas: su título lleva menos aire entre letras para que no se corte */
+.est-ficha-titulo {
+  letter-spacing: 0.6px;
+}
+
+/* ===== Rediseño de las vistas (0.19.0) ===== */
+
+/* ----- La barra de íconos: cinco a la vista (⋯, disposición, Ajustes, completa, panel de control); el resto, detrás de "⋯" ----- */
+body:not(.mas-abierto) #boton-historial,
+body:not(.mas-abierto) #boton-desglose,
+body:not(.mas-abierto) #boton-proyeccion,
+body:not(.mas-abierto) #boton-productos,
+body:not(.mas-abierto) #boton-compacto,
+body:not(.mas-abierto) #boton-mini {
+  display: none;
+}
+
+/* (en la compacta solo queda el botón de volver, como siempre) */
+body.compacto #boton-mas {
+  display: none;
+}
+
+body.franja .herramientas {
+  grid-template-columns: repeat(5, 18px);
+}
+
+body.franja.mas-abierto .herramientas {
+  grid-template-columns: repeat(6, 18px);
+}
+
+/* ----- Franja (horizontal, completa y panel de control): el número grande a la izquierda de cada columna ----- */
+body.franja .medidor-texto {
+  grid-template-columns: auto auto minmax(0, 1fr);
+  grid-template-rows: 12px 14px;
+  column-gap: 8px;
+  row-gap: 0;
+  align-items: end;
+  margin-bottom: 5px;
+}
+
+body.franja .etiqueta-con-boton {
+  display: contents;
+}
+
+body.franja .tarjeta .porcentaje {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  align-self: end;
+  font-size: clamp(22px, 1.7vw, 27px);
+  line-height: 26px;
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+body.franja .tarjeta .etiqueta {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: clamp(10px, 0.78vw, 12px);
+  line-height: 12px;
+  letter-spacing: 1px;
+}
+
+body.franja .tarjeta .comparacion {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: start;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 12px;
+}
+
+body.horizontal .comparacion {
+  display: block;
+}
+
+body.franja .tarjeta .detalle {
+  grid-column: 2 / 4;
+  grid-row: 2;
+  font-size: clamp(10.5px, 0.82vw, 13px);
+  line-height: 14px;
+}
+
+/* Hoy: el número grande y, al lado, "de 14%" (y la hora a la que llegarías al límite) */
+body.franja .tarjeta .solo-vertical {
+  display: block;
+}
+
+body.franja .tarjeta #hoy-detalle {
+  display: none;
+}
+
+/* ----- Compacta: los tres medidores (y los límites extra) en la misma línea, cada uno con su número y una barrita ----- */
+body.compacto #vista-datos:not(.oculto) {
+  grid-template-columns: repeat(var(--n-medidores, 3), minmax(0, 1fr)) auto;
+  column-gap: 10px;
+}
+
+body.compacto .extras {
+  display: contents;
+}
+
+body.compacto #vista-datos .medidor,
+body.compacto #vista-datos .medidor:not(:first-child),
+body.compacto #vista-datos .medidor:first-child {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 12px 3px;
+  row-gap: 4px;
+  min-width: 0;
+}
+
+body.compacto .medidor-texto {
+  display: block;
+  height: 12px;
+  margin: 0;
+  min-width: 0;
+}
+
+body.compacto .etiqueta-con-boton {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+
+body.compacto .tarjeta .etiqueta {
+  font-size: 9px;
+  line-height: 12px;
+  letter-spacing: 0.8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.compacto .tarjeta .porcentaje {
+  font-size: 12px;
+  line-height: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+body.compacto .tarjeta .detalle {
+  display: none;
+}
+
+body.compacto .tarjeta #hoy-porcentaje {
+  display: inline;
+}
+
+body.compacto .barra {
+  grid-column: auto;
+  grid-row: auto;
+  height: 3px;
+}
+
+/* ----- Completa: el historial grande a la izquierda; desglose y proyección, uno sobre otro, a la derecha ----- */
+body.completo:not(.ajustes-abierto) .panel-interior {
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px 18px;
+}
+
+body.completo:not(.ajustes-abierto) #vista-historial {
+  grid-row: 1 / 3;
+}
+
+body.completo:not(.ajustes-abierto) #vista-desglose,
+body.completo:not(.ajustes-abierto) #vista-proyeccion {
+  min-height: 0;
+  overflow: hidden;
+}
+
+body.completo:not(.ajustes-abierto) #vista-desglose .nota,
+body.completo:not(.ajustes-abierto) #vista-proyeccion .nota {
+  display: none;
+}
+
+body.completo:not(.ajustes-abierto) .titulo-vista {
+  margin-bottom: 5px;
+}
+
+body.completo:not(.ajustes-abierto) #vista-desglose .lista {
+  margin-top: 6px;
+  justify-content: flex-start;
+}
+
+body.completo:not(.ajustes-abierto) #vista-desglose .fila {
+  padding: 1px 0;
+  font-size: 11.5px;
+}
+
+body.completo:not(.ajustes-abierto) #vista-desglose .fila-cuenta {
+  font-size: 11.5px;
+}
+
+/* La proyección, en frases: tarjetas bajas, sin huecos */
+body.completo:not(.ajustes-abierto) #vista-proyeccion .proyeccion,
+body.completo:not(.ajustes-abierto) #vista-proyeccion .proyeccion:not(.varias) {
+  flex: none;
+  max-height: none;
+  margin-bottom: 3px;
+  padding: 2px 8px;
+}
+
+body.completo:not(.ajustes-abierto) .proyeccion-titulo {
+  font-size: 11.5px;
+}
+
+body.completo:not(.ajustes-abierto) .proyeccion-detalle {
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+/* ----- Mínima: dos anillos finos ----- */
+.mini-riel,
+.mini-relleno {
+  stroke-width: 4;
+}
+
+/* Completa: el desglose en dos columnas y la proyección en dos líneas por tarjeta (sin la etiqueta ni la comparación:
+   la comparación ya está arriba, junto a cada número) */
+body.completo:not(.ajustes-abierto) #vista-desglose .barra-total:not(.barra-cuenta) {
+  flex: none;
+  height: 8px;
+}
+
+body.completo:not(.ajustes-abierto):not(.con-resumen) #vista-desglose .lista {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 12px;
+  row-gap: 0;
+}
+
+body.completo:not(.ajustes-abierto) #vista-proyeccion .proyeccion:not(.varias) .proyeccion-etiqueta,
+body.completo:not(.ajustes-abierto) #vista-proyeccion .proyeccion-comparacion {
+  display: none;
+}
+
+/* Lista compacta (todas las cuentas en una línea cada una): los tres medidores, cada uno barra y número */
+body.todas.compacto .resumen-fila {
+  grid-template-columns: 96px repeat(var(--n-cols-lista, 3), minmax(0, 1fr));
+  column-gap: 10px;
+}
+
+body.todas.compacto .resumen-medidor,
+body.todas.compacto .resumen-medidor:nth-of-type(n + 2) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px;
+  column-gap: 4px;
+}
+
+body.todas.compacto .resumen-valor {
+  font-size: 11px;
+}
+
+/* Completa con varias cuentas: las tarjetas de la proyección tampoco llevan etiqueta (cada línea ya dice de qué habla) */
+body.completo:not(.ajustes-abierto) #vista-proyeccion .proyeccion-etiqueta {
+  display: none;
+}
+
+body.completo:not(.ajustes-abierto) .proyeccion-linea {
+  line-height: 16px;
+}
+
+/* Lista compacta: solo los números (no hay ancho para barras que se vean) */
+body.todas.compacto .resumen-medidor {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+body.todas.compacto .resumen-medidor .barra {
+  display: none;
+}
+
+body.todas.compacto .resumen-fila {
+  grid-template-columns: 104px repeat(var(--n-cols-lista, 3), minmax(0, 1fr));
+}
+
+body.compacto .tarjeta .etiqueta {
+  letter-spacing: 0.5px;
+}
+
+/* ----- Completa: el desglose toma su alto natural y la proyección se queda con el resto ----- */
+body.completo:not(.ajustes-abierto) .panel-interior {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+body.completo:not(.ajustes-abierto) #vista-desglose .lista {
+  margin-top: 4px;
+}
+
+body.completo:not(.ajustes-abierto) #vista-desglose .fila {
+  padding: 0;
+}
+
+body.completo:not(.ajustes-abierto) #vista-proyeccion .proyeccion,
+body.completo:not(.ajustes-abierto) #vista-proyeccion .proyeccion:not(.varias) {
+  margin-bottom: 2px;
+  padding: 1px 8px;
+}
+
+/* Lista compacta: los números, más juntos */
+body.todas.compacto .resumen-fila {
+  grid-template-columns: 88px repeat(var(--n-cols-lista, 3), minmax(0, 1fr));
+  column-gap: 8px;
+}
+
+body.todas.compacto .resumen-valor {
+  font-size: 10.5px;
+}
+
+/* ----- Lista de cuentas (vista normal vertical): una tarjetita por cuenta, con sus medidores en una fila ----- */
+body.todas:not(.compacto):not(.horizontal):not(.vista-cuentas) .resumen-fila:not(.sin-datos) {
+  --medidores-base: 3;
+  box-sizing: border-box;
+  grid-template-columns: repeat(calc(var(--medidores-base) + var(--n-extras-fila, 0)), minmax(0, 1fr));
+  grid-auto-rows: auto;
+  column-gap: 8px;
+  row-gap: 6px;
+  height: 74px;
+  margin-bottom: 6px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--fila);
+  align-content: start;
+}
+
+body.sin-hoy.todas:not(.compacto):not(.horizontal):not(.vista-cuentas) .resumen-fila:not(.sin-datos) {
+  --medidores-base: 2;
+}
+
+body.todas:not(.compacto):not(.horizontal):not(.vista-cuentas) .resumen-fila.activa {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--acento) 45%, transparent);
+}
+
+body.todas:not(.compacto):not(.horizontal):not(.vista-cuentas) .resumen-fila:not(.sin-datos) .resumen-nombre {
+  grid-column: 1 / -1;
+  padding-left: 0;
+  font-size: 12px;
+}
+
+body.todas:not(.compacto):not(.horizontal):not(.vista-cuentas) .resumen-fila:not(.sin-datos) .resumen-medidor {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 10px 16px 3px;
+  row-gap: 3px;
+  align-items: end;
+}
+
+body.todas:not(.compacto):not(.horizontal):not(.vista-cuentas) .resumen-fila:not(.sin-datos) .resumen-etiqueta {
+  font-size: 8.5px;
+  letter-spacing: 0.8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.todas:not(.compacto):not(.horizontal):not(.vista-cuentas) .resumen-fila:not(.sin-datos) .resumen-valor {
+  text-align: left;
+  font-size: 15px;
+  line-height: 16px;
+  letter-spacing: -0.3px;
+}
+
+body.todas:not(.compacto):not(.horizontal):not(.vista-cuentas) .resumen-fila:not(.sin-datos) .resumen-medidor .barra {
+  height: 3px;
+}
+
+/* ----- Panel de control: tres grupos (Hoy; Semana y mes; Hábitos), sin cajas, con un número por gráfico ----- */
+.tablero-grupos {
+  flex: 1 1 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: auto minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 4px 20px;
+}
+
+.tablero-grupo {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding-top: 6px;
+  border-top: 1px solid var(--separador);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: var(--texto-suave);
+}
+
+.tablero-grupo:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+body.tablero:not(.ajustes-abierto) .tablero-graficos .tablero-celda {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  overflow: hidden;
+}
+
+.tablero-celda-ancha {
+  grid-column: 2 / 4;
+}
+
+.tablero-numero {
+  flex: none;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  height: 20px;
+  margin: 1px 0 2px;
+  white-space: nowrap;
+}
+
+.tablero-numero b {
+  font-size: 18px;
+  line-height: 20px;
+  letter-spacing: -0.4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.tablero-numero small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 10px;
+  color: var(--texto-suave);
+}
+
+.tablero-celda .historial-opciones {
+  height: 14px;
+  margin-bottom: 0;
+}
+
+.tablero-celda .est-mapa {
+  gap: 1.5px;
+}
+
+/* (sin la barra de Hoy, la tarjetita mide lo mismo: el medidor que falta solo deja más ancho a los demás) */
+body.sin-hoy.todas:not(.compacto):not(.horizontal):not(.vista-cuentas) .resumen-fila:not(.sin-datos) {
+  height: 74px;
+}
+
+/* Tarjetitas de cuentas: en el DOM la barra va antes que el número; aquí el número va en medio y la barra al pie */
+body.todas:not(.compacto):not(.horizontal):not(.vista-cuentas) .resumen-fila:not(.sin-datos) .resumen-medidor .barra {
+  grid-row: 3;
+}
+
+body.todas:not(.compacto):not(.horizontal):not(.vista-cuentas) .resumen-fila:not(.sin-datos) .resumen-valor {
+  grid-row: 2;
+}
+
+/* Panel de control: el número va en la misma línea que el título (así el gráfico se queda con el alto) */
+body.tablero:not(.ajustes-abierto) .tablero-graficos .tablero-celda {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: 20px minmax(0, 1fr);
+  column-gap: 10px;
+  row-gap: 2px;
+}
+
+body.tablero:not(.ajustes-abierto) .tablero-graficos .tablero-celda .historial-opciones {
+  grid-column: 1;
+  grid-row: 1;
+  height: 20px;
+  min-width: 0;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+body.tablero:not(.ajustes-abierto) .tablero-graficos .tablero-numero {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  margin: 0;
+}
+
+body.tablero:not(.ajustes-abierto) .tablero-graficos .tablero-celda .grafico,
+body.tablero:not(.ajustes-abierto) .tablero-graficos .tablero-celda .est-mapa {
+  grid-column: 1 / -1;
+  grid-row: 2;
+}
+
+.tablero-celda .est-mapa-dia,
+.tablero-celda .est-mapa-hora {
+  font-size: 7px;
+}
+
+/* Panel de control: sin leyendas en los gráficos (los colores son los mismos que en el Historial y el Desglose de arriba);
+   así cada gráfico se queda con casi todo el alto de su fila */
+body.tablero:not(.ajustes-abierto) .tablero-graficos .tablero-celda .historial-promedio {
+  display: none;
+}
+
+body.tablero:not(.ajustes-abierto) .tablero-graficos .tablero-celda .historial-opciones,
+body.tablero:not(.ajustes-abierto) .tablero-graficos .tablero-celda .historial-opciones.leyenda-larga {
+  flex-wrap: nowrap;
+  height: 20px;
+}
+
+/* Panel de control: el gráfico mide lo que mide su fila (y no al revés: lo dibujado no agranda la fila) */
+body.tablero:not(.ajustes-abierto) .tablero-graficos .tablero-celda .grafico {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+body.tablero:not(.ajustes-abierto) .tablero-graficos .tablero-celda .grafico .columnas {
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
 }

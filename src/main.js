@@ -46,7 +46,7 @@ const MARGEN = 1;
 
 // Medidas de la tarjeta (sin el margen) en cada vista, en píxeles.
 const MEDIDAS_DE_VISTA = {
-  'normal-vertical': { ancho: 300, alto: 154 },    // las tres barras, una bajo la otra
+  'normal-vertical': { ancho: 300, alto: 184 },    // las tres barras, una bajo la otra (número grande y barra fina: 40 px cada una, 6 entre ellas)
   'normal-horizontal': { ancho: 540, alto: 92 },   // las tres barras, lado a lado
   compacto: { ancho: 300, alto: 44 },              // una sola línea con la barra de Hoy
   mini: { ancho: 64, alto: 64 },                   // un círculo con el anillo de Hoy
@@ -144,20 +144,20 @@ const RESUMEN_FILA = 22;
 let totalDeCuentas = 1; // cuántas cuentas hay (se actualiza al agregar o eliminar)
 let sinBarras = false; // ajuste "solo números": la tarjeta sin barras es más baja (ver AHORRO_SIN_BARRA_* y widget.css)
 let ocultarHoy = false; // ajuste "ocultar la barra de Hoy": la tarjeta vertical pierde un medidor; en la compacta y la mínima se ve la sesión
-const AHORRO_SIN_BARRA_VERTICAL = 13; // por cada medidor de la tarjeta vertical: la barra (10) y su separación (3)
+const AHORRO_SIN_BARRA_VERTICAL = 8;  // por cada medidor de la tarjeta vertical: la barra (4) y su separación (4)
 const AHORRO_SIN_BARRA_FRANJA = 15;   // en las vistas de franja (horizontal, completa y panel de control): la barra (9) y su separación (6)
 let verTodasLasCuentas = true; // ajuste: en la vista normal y la compacta, mostrar todas las cuentas a la vez (si hay más de una)
 
 // Cuando se muestran todas las cuentas a la vez, la tarjeta de siempre se reemplaza por una lista (una fila o un bloque por cuenta).
 // Estas medidas deben coincidir con widget.css (body.todas).
 // Los límites extra (por ejemplo Fable) de la cuenta que se muestra: cada uno es una barra más en la tarjeta.
-const ALTO_POR_LIMITE_EXTRA = 38;   // vista vertical (debe coincidir con widget.css)
+const ALTO_POR_LIMITE_EXTRA = 46;   // vista vertical: un medidor (40) y su separación (6); debe coincidir con widget.css
 const ANCHO_POR_LIMITE_EXTRA = 110; // vista horizontal
 
 const LISTA_CABECERA = 24; // el título con sus botones
-const LISTA_BLOQUE = 84;   // una cuenta con sus tres barras una bajo la otra (vista normal vertical)
+const LISTA_BLOQUE = 80;   // una cuenta como tarjetita: el nombre y, debajo, sus medidores en una fila (vista normal vertical)
 const LISTA_BLOQUE_SIN_DATOS = 28; // una cuenta sin sesión o sin datos: una sola línea
-const LISTA_FILA_EXTRA = 19;       // cada límite extra (Fable...) de una cuenta: una barra más en su bloque
+const LISTA_FILA_EXTRA = 0;        // los límites extra (Fable...) van en la misma fila: no agrandan el bloque
 const ANCHO_COLUMNA_EXTRA_LISTA = 183; // cada límite extra: una columna más en las filas anchas
 
 // Los límites extra (por modelo) de una cuenta, según lo último leído.
@@ -269,7 +269,7 @@ const hayResumenDeCuentas = () => totalDeCuentas >= 2 && !ventanasSeparadas;
 const ALTO_POR_CUENTA_EN_PROYECCION = 54; // una línea en "Hoy", otra en "Sesión 5 h" y otra en "Semana"
 const ALTO_POR_CUENTA_EN_DESGLOSE = 24;
 // La vista completa crece lo que le falta a la proyección a partir de la cuarta cuenta.
-const extraDeCompletoPorCuentas = () => (hayResumenDeCuentas() ? Math.max(0, totalDeCuentas - 2) * ALTO_POR_CUENTA_EN_PROYECCION : 0);
+const extraDeCompletoPorCuentas = () => (hayResumenDeCuentas() ? Math.max(0, totalDeCuentas - 1) * ALTO_POR_CUENTA_EN_PROYECCION : 0);
 
 function altoDelResumen() {
   return hayResumenDeCuentas() ? RESUMEN_SEPARACION + RESUMEN_RELLENO + RESUMEN_FILA * totalDeCuentas : 0;

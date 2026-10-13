@@ -29,7 +29,7 @@ Las capturas usan **datos simulados** (10 días de uso inventado), para mostrar 
 
 ![Vista completa con una cuenta](docs/captura-completo-una.png)
 
-**Panel de control.** Todo a la vez: lo de la vista completa y, debajo, una fila de fichas con tus números (día más alto, promedio, racha, límite sugerido...) y ocho gráficos, cada uno en su tarjeta: hoy hora a hora, los últimos 30 días, por día de la semana, el mapa de día y hora, el uso por producto (hoy, esta semana y semana a semana) y tus horas de más uso. Se adapta al tamaño que le des:
+**Panel de control.** Todo a la vez: lo de la vista completa y, debajo, los gráficos en tres grupos (Hoy; Semana y mes; Hábitos), cada uno con su número: hora a hora, por producto, horas de más uso, últimos 30 días, semana a semana, por día de la semana y el mapa de día y hora. Se adapta al tamaño que le des:
 
 ![Panel de control con una cuenta](docs/captura-panel.png)
 
@@ -111,7 +111,7 @@ Las capturas usan **datos simulados** (10 días de uso inventado), para mostrar 
 - **Actualizar con un clic** cuando hay una versión nueva: se descarga, se instala y vuelve a abrirse sola.
 
 ### Vistas y aspecto
-- Las vistas van de menos a más información: **Mínima** (un círculo con un anillo que se llena con tu uso de hoy), **Compacta** (una línea con las barras), **Normal** (la tarjeta, vertical u horizontal; los paneles se abren con sus íconos), **Completa** (la tarjeta con historial, desglose y proyección a la vista) y **Panel de control** (todo: además, las fichas con tus números y ocho gráficos: hoy hora a hora, 30 días, por día de la semana, el mapa de día y hora, horas de más uso y el uso por producto de hoy, de la semana y semana a semana).
+- Las vistas van de menos a más información: **Mínima** (dos anillos: afuera la semana, adentro la sesión de 5 horas), **Compacta** (una línea con los tres números y sus barritas), **Normal** (la tarjeta, vertical u horizontal: el número grande primero; los paneles se abren desde el botón ⋯), **Completa** (los números arriba; el historial grande a la izquierda; desglose y proyección a la derecha) y **Panel de control** (todo, con los gráficos por grupos: hora a hora, por producto, horas de más uso, 30 días, semana a semana, por día de la semana y el mapa de día y hora).
 - **Cuentas:** todas tus cuentas en una lista, una fila por cuenta.
 - **Cada cuenta en su propia ventana** (opcional): cada una se mueve por separado y tiene su propia vista.
 - **Partes en su propia ventana:** el historial, el desglose, la proyección, el uso por producto y la ventana de contexto se pueden sacar del widget (botón junto a la X) y poner donde quieras. Con varias cuentas, cada una dice de qué cuenta es.
