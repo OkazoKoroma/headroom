@@ -31,6 +31,7 @@ const VALORES_INICIALES = {
   avisoRitmoSemana: true, // avisar si a este ritmo agotarías la cuota semanal antes del reinicio
   sinBarras: false,    // "solo números": la tarjeta no dibuja las barras (queda más baja)
   ocultarHoy: false,   // sin la barra de Hoy: solo la sesión de 5 horas, la semana y los límites por modelo
+  panelTodas: false,   // en el Panel con varias cuentas: true = una fila por cuenta ("Todas"); false = la cabecera de la cuenta elegida
   seguirAClaude: false, // mostrar el widget al abrir Claude (la app o Claude Code) y ocultarlo al cerrarlo
   resumenes: true,     // avisar cuánto usaste ayer (al empezar el día) y en la semana (al reiniciarse)
   bienvenidaVista: false, // true cuando ya se mostró la bienvenida de la primera vez
@@ -42,6 +43,7 @@ const VALORES_INICIALES = {
   contextoVisible: true,  // mostrar la barra "Contexto" del chat actual de Claude Code
   avisoContexto: true,    // recordar compactar el chat al llegar a umbralContexto (y cada 10% más)
   umbralContexto: 70,     // % del contexto en que llega el aviso
+  avisosContexto: {},     // { sesión del chat: escalón ya avisado }: así no se repiten al reiniciar la app (las últimas 50)
   tamanoContexto: 'auto', // tamaño de la ventana de contexto: 'auto' (según el modelo), '200k' o '1m'
   todasLasCuentas: true, // en la vista normal y la compacta, mostrar todas las cuentas a la vez (si hay más de una)
   ventanasSeparadas: false, // cada cuenta en su propia ventana (cada una guarda su posición y su vista en "ventana")
@@ -69,6 +71,7 @@ const CAMPOS_DE_CUENTA = {
   sesiones: [],        // [{ inicioMs, finMs, maximo, llenaMs }]: las sesiones de 5 horas terminadas (las últimas 300), para las estadísticas
   curvaSemanaPasada: null, // { reinicioMs, puntos: [[horas, %], ...] }: cómo fue subiendo la semana anterior (para comparar con esta)
   curvasDeModelos: null,   // { Fable: { reinicioMs, puntos, pasada: { reinicioMs, puntos } } }: lo mismo, para el límite semanal de cada modelo
+  lecturasDeAyer: null, // lo mismo, del día anterior (para que "últimas 24 h" no empiece de cero a medianoche)
   lecturasDeHoy: null, // { dia, puntos: [{ t, hoy, sesion, productos }] }: cada lectura de hoy, para los gráficos del día
   nombresDeProductos: {}, // { clave: nombre } de los productos que informa claude.ai (Claude Code, Chats...)
   diario: null,        // estado del día en curso (lo maneja calculo.js)
@@ -76,7 +79,7 @@ const CAMPOS_DE_CUENTA = {
 };
 
 const PARTICION_PRIMERA = 'persist:claude'; // la sesión de la primera cuenta (la que ya existía antes de haber varias)
-const MAXIMO_DE_CUENTAS = 5;
+const MAXIMO_DE_CUENTAS = Infinity; // sin límite: se pueden agregar tantas cuentas como se quiera
 
 // Nombre del archivo donde se guarda todo. El modo de prueba usa otro,
 // para no mezclar datos inventados con tu historial real.

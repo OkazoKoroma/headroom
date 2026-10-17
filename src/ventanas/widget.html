@@ -58,7 +58,7 @@
         <div class="vista-panel" id="vista-productos">
           <div class="historial-opciones">
             <div class="segmentos" role="group" aria-label="Días" data-i18n-aria="historial.dias">
-              <button type="button" class="segmento" data-productos-dias="1" data-i18n="historial.dia">Hoy</button>
+              <button type="button" class="segmento" data-productos-dias="1" data-i18n="productos.24h">24 h</button>
               <button type="button" class="segmento" data-productos-dias="semana" data-i18n="productos.semana">Esta semana</button>
               <button type="button" class="segmento" data-productos-dias="30" data-i18n="historial.30">30 días</button>
               <button type="button" class="segmento" data-productos-dias="semanas" data-i18n="productos.semanas">Semanas</button>
@@ -84,12 +84,10 @@
                   <label class="campo">
                     <span class="campo-titulo" data-i18n="aj.vista">Vista</span>
                     <select id="modo">
-                      <option value="mini" data-i18n="aj.vista.mini">Mínima: solo un círculo con el número</option>
-                      <option value="compacto" data-i18n="aj.vista.compacto">Compacta: una línea con las barras</option>
-                      <option value="normal" data-i18n="aj.vista.normal">Normal: la tarjeta (los paneles se abren con sus íconos)</option>
-                      <option value="completo" data-i18n="aj.vista.completo">Completa: la tarjeta con historial, desglose y proyección</option>
-                      <option value="tablero" data-i18n="aj.vista.tablero">Panel de control: todo, con fichas y ocho gráficos</option>
-                      <option value="cuentas" data-i18n="aj.vista.cuentas">Cuentas: todas las cuentas en una lista</option>
+                      <option value="mini" data-i18n="aj.vista.mini">Mínima (un círculo)</option>
+                      <option value="compacto" data-i18n="aj.vista.compacto">Compacta (una línea)</option>
+                      <option value="normal" data-i18n="aj.vista.normal">Normal (la tarjeta)</option>
+                      <option value="tablero" data-i18n="aj.vista.tablero">Panel (todo)</option>
                     </select>
                   </label>
                   <label class="campo">
@@ -99,7 +97,7 @@
                       <option value="horizontal" data-i18n="aj.disposicion.horizontal">Horizontal (lado a lado)</option>
                     </select>
                   </label>
-                  <p class="campo-ayuda" data-i18n="aj.disposicion.ayuda">La disposición vale para la vista normal. La vista completa siempre es ancha.</p>
+                  <p class="campo-ayuda" data-i18n="aj.disposicion.ayuda">Vale para la vista normal.</p>
                   <label class="casilla">
                     <input id="todasLasCuentas" type="checkbox">
                     <span data-i18n="aj.todas">Mostrar todas las cuentas a la vez</span>
@@ -429,75 +427,59 @@
       </div>
     </section>
 
-    <!-- Panel de control: debajo de la vista completa, los gráficos en tres grupos (Hoy; Semana y mes; Hábitos), cada uno
-         con su número (widget.js los dibuja) -->
-    <section class="tablero-graficos" id="tablero" aria-label="Panel de control" data-i18n-aria="tablero.titulo">
-      <div class="tablero-grupos">
-        <h3 class="tablero-grupo" data-i18n="tablero.grupo.hoy">Hoy</h3>
-        <div class="tablero-celda">
-          <div class="historial-opciones">
-            <h4 class="tablero-titulo" data-i18n="tablero.hoy">Hora a hora</h4>
-            <span class="historial-promedio" id="tablero-hoy-leyenda"></span>
+    <!-- El Panel: debajo de la vista completa, cuatro preguntas (ahora, la semana, los hábitos y el año). widget.js lo dibuja. -->
+    <section class="tablero-graficos" id="tablero" aria-label="Panel" data-i18n-aria="tablero.titulo">
+      <div class="pnl">
+        <div class="pnl-franja" id="pnl-f-ahora">
+          <h3 class="pnl-pregunta"><span data-i18n="pnl.ahora">¿Cómo voy ahora?</span><small data-i18n="pnl.ahora.nota">con las lecturas de hoy</small><span class="pnl-acciones"><button class="boton-cerrar pnl-separar" data-separar="pnl-ahora" type="button" title="Sacar a su propia ventana" data-i18n-title="parte.separar" aria-label="Sacar a su propia ventana" data-i18n-aria="parte.separar"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M11.5 9.5v3a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3"/></svg></button><button class="boton-cerrar pnl-juntar" type="button" title="Volver al Panel" data-i18n-title="pnl.juntar" aria-label="Volver al Panel" data-i18n-aria="pnl.juntar"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></span></h3>
+          <div class="pnl-fila pnl-4">
+          <div class="pnl-ficha" id="pnl-ritmo"><span class="pnl-etq" data-i18n="pnl.ritmo">Ritmo actual</span><b class="pnl-num" id="pnl-ritmo-num">—</b><span class="pnl-det" id="pnl-ritmo-det"></span></div>
+          <div class="pnl-ficha" id="pnl-queda"><span class="pnl-etq" data-i18n="pnl.queda">Te queda hoy</span><b class="pnl-num" id="pnl-queda-num">—</b><span class="pnl-det" id="pnl-queda-det"></span></div>
+          <div class="pnl-ficha" id="pnl-sesiones"><span class="pnl-etq" data-i18n="pnl.sesionesHoy">Sesiones de hoy</span><b class="pnl-num" id="pnl-sesiones-num">—</b><span class="pnl-det" id="pnl-sesiones-det"></span></div>
+          <div class="pnl-ficha" id="pnl-arranque"><span class="pnl-etq" data-i18n="pnl.arranque">Arrancaste a las</span><b class="pnl-num" id="pnl-arranque-num">—</b><span class="pnl-det" id="pnl-arranque-det"></span></div>
           </div>
-          <div class="tablero-numero" id="tablero-hoy-numero"></div>
-          <div class="grafico" id="tablero-hoy-grafico"><div class="columnas" id="tablero-hoy"></div></div>
         </div>
-        <div class="tablero-celda">
-          <div class="historial-opciones">
-            <h4 class="tablero-titulo" data-i18n="tablero.prodHoy">Por producto</h4>
-            <span class="historial-promedio" id="tablero-prod-hoy-leyenda"></span>
+        <div class="pnl-franja" id="pnl-f-semana">
+          <h3 class="pnl-pregunta"><span data-i18n="pnl.semana">¿Cómo va la semana?</span><small id="pnl-semana-nota"></small><span class="pnl-acciones"><button class="boton-cerrar pnl-separar" data-separar="pnl-semana" type="button" title="Sacar a su propia ventana" data-i18n-title="parte.separar" aria-label="Sacar a su propia ventana" data-i18n-aria="parte.separar"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M11.5 9.5v3a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3"/></svg></button><button class="boton-cerrar pnl-juntar" type="button" title="Volver al Panel" data-i18n-title="pnl.juntar" aria-label="Volver al Panel" data-i18n-aria="pnl.juntar"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></span></h3>
+          <div class="pnl-fila pnl-3">
+          <div class="pnl-bloque" id="pnl-semvs"><span class="pnl-tit" data-i18n="pnl.semVs" id="pnl-semvs-tit">Semana: contra la pasada, día a día</span><b class="pnl-num" id="pnl-semvs-num">—</b><div class="pnl-graf" id="pnl-semvs-graf"><div class="columnas" id="pnl-semvs-col"></div></div><span class="historial-promedio pnl-oculto" id="pnl-semvs-leyenda"></span><span class="pnl-det" id="pnl-semvs-det"></span></div>
+          <div class="pnl-bloque" id="pnl-fablevs"><span class="pnl-tit" data-i18n="pnl.fableVs" id="pnl-fablevs-tit">Fable: contra la pasada, día a día</span><b class="pnl-num" id="pnl-fablevs-num">—</b><div class="pnl-graf" id="pnl-fablevs-graf"><div class="columnas" id="pnl-fablevs-col"></div></div><span class="historial-promedio pnl-oculto" id="pnl-fablevs-leyenda"></span><span class="pnl-det" id="pnl-fablevs-det"></span></div>
+          <div class="pnl-bloque" id="pnl-fin"><span class="pnl-tit" data-i18n="pnl.fin" id="pnl-fin-tit">Cómo terminarías</span><b class="pnl-num" id="pnl-fin-num">—</b><div class="pnl-graf" id="pnl-fin-graf"><div class="columnas" id="pnl-fin-col"></div></div><span class="historial-promedio pnl-oculto" id="pnl-fin-leyenda"></span><span class="pnl-det" id="pnl-fin-det"></span></div>
           </div>
-          <div class="tablero-numero" id="tablero-prod-hoy-numero"></div>
-          <div class="grafico" id="tablero-prod-hoy-grafico"><div class="columnas" id="tablero-prod-hoy"></div></div>
+          <div class="pnl-fila pnl-1">
+          <div class="pnl-bloque" id="pnl-prod"><span class="pnl-tit" data-i18n="pnl.prod" id="pnl-prod-tit">Por producto, esta semana</span><b class="pnl-num" id="pnl-prod-num">—</b><div class="pnl-stack" id="pnl-prod-stack"></div><div class="pnl-lista" id="pnl-prod-lista"></div><span class="pnl-det" id="pnl-prod-det"></span></div>
+          </div>
         </div>
-        <div class="tablero-celda">
-          <div class="historial-opciones">
-            <h4 class="tablero-titulo" data-i18n="tablero.horas">Horas de más uso</h4>
-            <span class="historial-promedio" id="tablero-horas-leyenda"></span>
+        <div class="pnl-franja" id="pnl-f-habitos">
+          <h3 class="pnl-pregunta"><span data-i18n="pnl.habitos">¿Cuándo y cómo uso Claude?</span><small data-i18n="pnl.habitos.nota">últimos 30 días</small><span class="pnl-acciones"><button class="boton-cerrar pnl-separar" data-separar="pnl-habitos" type="button" title="Sacar a su propia ventana" data-i18n-title="parte.separar" aria-label="Sacar a su propia ventana" data-i18n-aria="parte.separar"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M11.5 9.5v3a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3"/></svg></button><button class="boton-cerrar pnl-juntar" type="button" title="Volver al Panel" data-i18n-title="pnl.juntar" aria-label="Volver al Panel" data-i18n-aria="pnl.juntar"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></span></h3>
+          <div class="pnl-fila pnl-mapa">
+          <div class="pnl-bloque" id="pnl-mapa"><span class="pnl-tit" data-i18n="est.mapa" id="pnl-mapa-tit">Cuándo usas más (día y hora)</span><b class="pnl-num" id="pnl-mapa-num">—</b><div class="est-mapa pnl-mapa-cuerpo" id="pnl-mapa-col"></div><span class="pnl-det" id="pnl-mapa-det"></span></div>
+          <div class="pnl-bloque" id="pnl-pordia"><span class="pnl-tit" data-i18n="est.porDia" id="pnl-pordia-tit">Por día de la semana</span><b class="pnl-num" id="pnl-pordia-num">—</b><div class="pnl-graf" id="pnl-pordia-graf"><div class="columnas" id="pnl-pordia-col"></div></div><span class="historial-promedio pnl-oculto" id="pnl-pordia-leyenda"></span><span class="pnl-det" id="pnl-pordia-det"></span></div>
+          <div class="pnl-bloque" id="pnl-diatipo"><span class="pnl-tit" data-i18n="pnl.diaTipo" id="pnl-diatipo-tit">Tu día tipo</span><b class="pnl-num" id="pnl-diatipo-num">—</b><div class="pnl-tramos" id="pnl-diatipo-tramos"></div><div class="pnl-tramos-etq" id="pnl-diatipo-etq"></div><span class="pnl-det" id="pnl-diatipo-det"></span></div>
           </div>
-          <div class="tablero-numero" id="tablero-horas-numero"></div>
-          <div class="grafico" id="tablero-horas-grafico"><div class="columnas" id="tablero-horas"></div></div>
+          <div class="pnl-fila pnl-4">
+          <div class="pnl-ficha" id="pnl-racha"><span class="pnl-etq" data-i18n="est.racha">Racha bajo tu límite</span><b class="pnl-num" id="pnl-racha-num">—</b><span class="pnl-det" id="pnl-racha-det"></span></div>
+          <div class="pnl-ficha" id="pnl-sugerido"><span class="pnl-etq" data-i18n="est.sugerido">Límite sugerido</span><b class="pnl-num" id="pnl-sugerido-num">—</b><span class="pnl-det" id="pnl-sugerido-det"></span></div>
+          <div class="pnl-ficha" id="pnl-agotadas"><span class="pnl-etq" data-i18n="est.sesiones">Sesiones agotadas</span><b class="pnl-num" id="pnl-agotadas-num">—</b><span class="pnl-det" id="pnl-agotadas-det"></span></div>
+          <div class="pnl-ficha" id="pnl-sinuso"><span class="pnl-etq" data-i18n="pnl.diasSinUso">Días sin uso</span><b class="pnl-num" id="pnl-sinuso-num">—</b><span class="pnl-det" id="pnl-sinuso-det"></span></div>
+          </div>
         </div>
-        <h3 class="tablero-grupo" data-i18n="tablero.grupo.semana">Semana y mes</h3>
-        <div class="tablero-celda">
-          <div class="historial-opciones">
-            <h4 class="tablero-titulo" data-i18n="tablero.dias">Últimos 30 días</h4>
-            <span class="historial-promedio" id="tablero-dias-leyenda"></span>
+        <div class="pnl-franja" id="pnl-f-anio">
+          <h3 class="pnl-pregunta"><span data-i18n="pnl.anio">¿Cómo voy en el año?</span><small data-i18n="pnl.anio.nota">hasta 12 meses</small><span class="pnl-acciones"><button class="boton-cerrar pnl-separar" data-separar="pnl-anio" type="button" title="Sacar a su propia ventana" data-i18n-title="parte.separar" aria-label="Sacar a su propia ventana" data-i18n-aria="parte.separar"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M11.5 9.5v3a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3"/></svg></button><button class="boton-cerrar pnl-juntar" type="button" title="Volver al Panel" data-i18n-title="pnl.juntar" aria-label="Volver al Panel" data-i18n-aria="pnl.juntar"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></span></h3>
+          <div class="pnl-fila pnl-2">
+          <div class="pnl-bloque" id="pnl-semanas"><span class="pnl-tit" data-i18n="pnl.semanasFin" id="pnl-semanas-tit">Semana: cómo terminó cada una</span><b class="pnl-num" id="pnl-semanas-num">—</b><div class="pnl-graf" id="pnl-semanas-graf"><div class="columnas" id="pnl-semanas-col"></div></div><span class="historial-promedio pnl-oculto" id="pnl-semanas-leyenda"></span><span class="pnl-det" id="pnl-semanas-det"></span></div>
+          <div class="pnl-bloque" id="pnl-fablesem"><span class="pnl-tit" data-i18n="pnl.fableFin" id="pnl-fablesem-tit">Fable: cómo terminó cada una</span><b class="pnl-num" id="pnl-fablesem-num">—</b><div class="pnl-graf" id="pnl-fablesem-graf"><div class="columnas" id="pnl-fablesem-col"></div></div><span class="historial-promedio pnl-oculto" id="pnl-fablesem-leyenda"></span><span class="pnl-det" id="pnl-fablesem-det"></span></div>
           </div>
-          <div class="tablero-numero" id="tablero-dias-numero"></div>
-          <div class="grafico" id="tablero-dias-grafico"><div class="columnas" id="tablero-dias"></div></div>
-        </div>
-        <div class="tablero-celda">
-          <div class="historial-opciones">
-            <h4 class="tablero-titulo" data-i18n="tablero.prodSemana">Por producto, esta semana</h4>
-            <span class="historial-promedio" id="tablero-prod-semana-leyenda"></span>
+          <div class="pnl-fila pnl-2">
+          <div class="pnl-bloque" id="pnl-meses"><span class="pnl-tit" data-i18n="pnl.mesAMes" id="pnl-meses-tit">Mes a mes</span><b class="pnl-num" id="pnl-meses-num">—</b><div class="pnl-graf" id="pnl-meses-graf"><div class="columnas" id="pnl-meses-col"></div></div><span class="historial-promedio pnl-oculto" id="pnl-meses-leyenda"></span><span class="pnl-det" id="pnl-meses-det"></span></div>
+          <div class="pnl-bloque" id="pnl-sessem"><span class="pnl-tit" data-i18n="pnl.sesionesSemana" id="pnl-sessem-tit">Sesiones agotadas por semana</span><b class="pnl-num" id="pnl-sessem-num">—</b><div class="pnl-graf" id="pnl-sessem-graf"><div class="columnas" id="pnl-sessem-col"></div></div><span class="historial-promedio pnl-oculto" id="pnl-sessem-leyenda"></span><span class="pnl-det" id="pnl-sessem-det"></span></div>
           </div>
-          <div class="tablero-numero" id="tablero-prod-semana-numero"></div>
-          <div class="grafico" id="tablero-prod-semana-grafico"><div class="columnas" id="tablero-prod-semana"></div></div>
-        </div>
-        <div class="tablero-celda">
-          <div class="historial-opciones">
-            <h4 class="tablero-titulo" data-i18n="tablero.semanas">Semana a semana</h4>
-            <span class="historial-promedio" id="tablero-semanas-leyenda"></span>
+          <div class="pnl-fila pnl-4">
+          <div class="pnl-ficha" id="pnl-masalto"><span class="pnl-etq" data-i18n="est.masAlto">Día más alto</span><b class="pnl-num" id="pnl-masalto-num">—</b><span class="pnl-det" id="pnl-masalto-det"></span></div>
+          <div class="pnl-ficha" id="pnl-semmax"><span class="pnl-etq" data-i18n="pnl.semanaMax">Semana más alta · más baja</span><b class="pnl-num" id="pnl-semmax-num">—</b><span class="pnl-det" id="pnl-semmax-det"></span></div>
+          <div class="pnl-ficha" id="pnl-fablemax"><span class="pnl-etq" data-i18n="pnl.fableMax">Fable, semana más alta</span><b class="pnl-num" id="pnl-fablemax-num">—</b><span class="pnl-det" id="pnl-fablemax-det"></span></div>
+          <div class="pnl-ficha" id="pnl-pctagot"><span class="pnl-etq" data-i18n="pnl.pctAgotadas">Semanas en que agotaste la cuota</span><b class="pnl-num" id="pnl-pctagot-num">—</b><span class="pnl-det" id="pnl-pctagot-det"></span></div>
           </div>
-          <div class="tablero-numero" id="tablero-semanas-numero"></div>
-          <div class="grafico" id="tablero-semanas-grafico"><div class="columnas" id="tablero-semanas"></div></div>
-        </div>
-        <h3 class="tablero-grupo" data-i18n="tablero.grupo.habitos">Hábitos</h3>
-        <div class="tablero-celda">
-          <div class="historial-opciones">
-            <h4 class="tablero-titulo" data-i18n="est.porDia">Por día de la semana</h4>
-            <span class="historial-promedio" id="tablero-por-dia-leyenda"></span>
-          </div>
-          <div class="tablero-numero" id="tablero-por-dia-numero"></div>
-          <div class="grafico" id="tablero-por-dia-grafico"><div class="columnas" id="tablero-por-dia"></div></div>
-        </div>
-        <div class="tablero-celda tablero-celda-ancha">
-          <div class="historial-opciones">
-            <h4 class="tablero-titulo" data-i18n="est.mapa">Cuándo usas más (día y hora)</h4>
-          </div>
-          <div class="tablero-numero" id="tablero-mapa-numero"></div>
-          <div class="est-mapa" id="tablero-mapa"></div>
         </div>
       </div>
     </section>
@@ -511,32 +493,38 @@
           <button class="boton-icono" data-panel="cuentas" type="button" title="Cuentas" data-i18n-title="panel.cuentas" aria-label="Cuentas" data-i18n-aria="panel.cuentas" aria-pressed="false">
                 <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="5.5" r="2.7"/><path d="M2.8 14c.6-2.8 2.7-4.2 5.2-4.2s4.6 1.4 5.2 4.2"/></svg>
               </button>
-          <button class="boton-icono" data-panel="ajustes" type="button" title="Ajustes" data-i18n-title="boton.ajustes" aria-label="Abrir los ajustes" data-i18n-aria="boton.ajustesAria" aria-pressed="false">
-                <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4.5h7M12.5 4.5h1M2.5 11.5h1M6.5 11.5h7"/><circle cx="11" cy="4.5" r="1.6"/><circle cx="5" cy="11.5" r="1.6"/></svg>
-              </button>
-          <button class="boton-icono" data-alternar="compacto" type="button" title="Vista compacta (una línea)" data-i18n-title="boton.compacto" aria-label="Cambiar entre la vista compacta y la normal" data-i18n-aria="boton.compactoAria" aria-pressed="false">
-                <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1.8" y="5.4" width="12.4" height="5.2" rx="2.6"/><path d="M4.6 8h3.4"/></svg>
-              </button>
-          <button class="boton-icono" data-alternar="completo" type="button" title="Vista completa (todo a la vez)" data-i18n-title="boton.completo" aria-label="Cambiar entre la vista completa y la normal" data-i18n-aria="boton.completoAria" aria-pressed="false">
-                <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="5" height="5" rx="1.2"/><rect x="9" y="2" width="5" height="5" rx="1.2"/><rect x="2" y="9" width="5" height="5" rx="1.2"/><rect x="9" y="9" width="5" height="5" rx="1.2"/></svg>
-              </button>
-          <!-- Panel de control (todos los gráficos) y vista mínima (un círculo) -->
-          <button class="boton-icono" data-alternar="tablero" type="button" title="Panel de control (todos los gráficos)" data-i18n-title="boton.tablero" aria-label="Panel de control" data-i18n-aria="boton.tablero" aria-pressed="false">
-            <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2.5" width="12" height="11" rx="2"/><path d="M4.5 10.5l2.4-3 2 1.8 2.6-3.4"/></svg>
-          </button>
-          <button class="boton-icono" data-alternar="mini" type="button" title="Vista mínima (un círculo)" data-i18n-title="boton.mini" aria-label="Vista mínima" data-i18n-aria="boton.mini">
-            <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="4.6"/><circle cx="8" cy="8" r="1" fill="currentColor"/></svg>
-          </button>
           <button class="boton-icono boton-lista-orientacion" data-alternar="orientacion" type="button" title="Cambiar la disposición (vertical / horizontal)" data-i18n-title="boton.orientacion" aria-label="Cambiar entre la disposición vertical y la horizontal" data-i18n-aria="boton.orientacionAria">
                 <svg class="icono-a-horizontal" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M6 3v10M10 3v10"/></svg>
                 <svg class="icono-a-vertical" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M2 6.3h12M2 9.7h12"/></svg>
               </button>
-          <button class="boton-icono boton-lista-volver" data-alternar="cuentas" type="button" title="Volver a la vista normal" data-i18n-title="boton.vistaNormal" aria-label="Volver a la vista normal" data-i18n-aria="boton.vistaNormal">
-                <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4h11M2.5 8h11M2.5 12h11"/></svg>
+          <!-- Menos y más información: recorren los tamaños (mínima → compacta → normal → completa → panel de control) -->
+          <button class="boton-icono boton-tamano" data-tamano="-1" type="button" title="Menos información" data-i18n-title="boton.menos" aria-label="Menos información" data-i18n-aria="boton.menos">−</button>
+          <button class="boton-icono boton-tamano" data-tamano="1" type="button" title="Más información" data-i18n-title="boton.mas" aria-label="Más información" data-i18n-aria="boton.mas">+</button>
+          <button class="boton-icono" data-panel="ajustes" type="button" title="Ajustes" data-i18n-title="boton.ajustes" aria-label="Abrir los ajustes" data-i18n-aria="boton.ajustesAria" aria-pressed="false">
+                <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4.5h7M12.5 4.5h1M2.5 11.5h1M6.5 11.5h7"/><circle cx="11" cy="4.5" r="1.6"/><circle cx="5" cy="11.5" r="1.6"/></svg>
               </button>
         </div>
       </div>
+      <!-- Los paneles, como pestañas con nombre al pie (la activa se marca; se abren debajo o en su propia ventana) -->
+      <div class="pestanas">
+        <button class="pestana" data-panel="historial" type="button" data-i18n="pestana.historial">Historial</button>
+        <button class="pestana" data-panel="desglose" type="button" data-i18n="pestana.desglose">Desglose</button>
+        <button class="pestana" data-panel="proyeccion" type="button" data-i18n="pestana.proyeccion">Proyección</button>
+        <button class="pestana" data-panel="productos" type="button" data-i18n="pestana.productos">Productos</button>
+      </div>
     </section>
+
+    <!-- El Panel con varias cuentas: una pastilla por cuenta y "Todas"; a la derecha, menos, más y Ajustes -->
+    <div class="pastillas-cuentas" id="pastillas-cuentas">
+      <div class="pastillas-lista" id="pastillas-lista" role="tablist" aria-label="Cuentas" data-i18n-aria="panel.cuentas"></div>
+      <div class="pastillas-botones">
+        <button class="boton-icono boton-tamano" data-tamano="-1" type="button" title="Menos información" data-i18n-title="boton.menos" aria-label="Menos información" data-i18n-aria="boton.menos">−</button>
+        <button class="boton-icono boton-tamano" data-tamano="1" type="button" title="Más información" data-i18n-title="boton.mas" aria-label="Más información" data-i18n-aria="boton.mas">+</button>
+        <button class="boton-icono" data-panel="ajustes" type="button" title="Ajustes" data-i18n-title="boton.ajustes" aria-label="Abrir los ajustes" data-i18n-aria="boton.ajustesAria" aria-pressed="false">
+          <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4.5h7M12.5 4.5h1M2.5 11.5h1M6.5 11.5h7"/><circle cx="11" cy="4.5" r="1.6"/><circle cx="5" cy="11.5" r="1.6"/></svg>
+        </button>
+      </div>
+    </div>
 
     <!-- La tarjeta del widget -->
     <div class="tarjeta">
@@ -564,11 +552,12 @@
           <div class="medidor-texto">
             <span class="etiqueta-con-boton">
               <span class="etiqueta" id="etiqueta-hoy" data-i18n="hoy.etiqueta">Hoy</span>
-              <span class="porcentaje solo-vertical" id="hoy-porcentaje"></span>
+              <span class="porcentaje solo-vertical" id="hoy-porcentaje"><span id="hoy-numero"></span><small class="porcentaje-sufijo" id="hoy-de"></small></span>
               <span class="comparacion" id="hoy-comparacion"></span>
             </span>
             <span class="detalle" id="hoy-detalle"></span>
             <span class="detalle solo-vertical" id="hoy-detalle-corto"></span>
+            <span class="detalle solo-franja" id="hoy-detalle-franja"></span>
           </div>
           <div class="barra"><div class="barra-relleno" id="relleno-hoy"></div></div>
         </div>
@@ -577,7 +566,7 @@
           <div class="medidor-texto">
             <span class="etiqueta-con-boton">
               <span class="etiqueta" data-i18n="sesion.etiqueta">Sesión 5 h</span>
-              <span class="porcentaje" id="sesion-porcentaje"></span>
+              <span class="porcentaje"><span id="sesion-porcentaje"></span><small class="porcentaje-sufijo porcentaje-signo">%</small></span>
               <span class="comparacion" id="sesion-comparacion"></span>
             </span>
             <span class="detalle" id="sesion-detalle"></span>
@@ -589,7 +578,7 @@
           <div class="medidor-texto">
             <span class="etiqueta-con-boton">
               <span class="etiqueta" id="etiqueta-semana" data-i18n="semana.etiqueta">Semana</span>
-              <span class="porcentaje" id="semana-porcentaje"></span>
+              <span class="porcentaje"><span id="semana-porcentaje"></span><small class="porcentaje-sufijo porcentaje-signo">%</small></span>
               <span class="comparacion" id="semana-comparacion"></span>
             </span>
             <span class="detalle" id="semana-detalle"></span>
@@ -600,49 +589,26 @@
         <!-- Los límites semanales extra por modelo (por ejemplo Fable en el plan Max): widget.js agrega aquí una barra por cada uno -->
         <div class="extras" id="extras"></div>
 
-        <!-- Barra de herramientas: los íconos que despliegan paneles y cambian la vista. No arrastran la ventana, así se pueden pulsar. -->
+        <!-- Los paneles, como pestañas con nombre al pie (la activa se marca; se abren debajo o en su propia ventana) -->
+        <div class="pestanas">
+          <button class="pestana" data-panel="historial" type="button" data-i18n="pestana.historial">Historial</button>
+          <button class="pestana" data-panel="desglose" type="button" data-i18n="pestana.desglose">Desglose</button>
+          <button class="pestana" data-panel="proyeccion" type="button" data-i18n="pestana.proyeccion">Proyección</button>
+          <button class="pestana" data-panel="productos" type="button" data-i18n="pestana.productos">Productos</button>
+        </div>
+
+        <!-- Barra de herramientas: disposición, menos y más información, y Ajustes. No arrastran la ventana, así se pueden pulsar. -->
         <div class="herramientas">
-          <!-- Cuatro íconos despliegan un panel (historial, desglose, proyección y ajustes); los dos últimos cambian la vista. -->
-              <!-- "Más": despliega los íconos que no están siempre a la vista (los paneles, la compacta y la mínima) -->
-              <button id="boton-mas" class="boton-icono" type="button" title="Más" data-i18n-title="boton.mas" aria-label="Más opciones" data-i18n-aria="boton.mas" aria-pressed="false">
-                <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="currentColor"><circle cx="3.2" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="12.8" cy="8" r="1.5"/></svg>
-              </button>
-              <button id="boton-historial" class="boton-icono" data-panel="historial" type="button" title="Uso de los últimos 7 días" data-i18n-title="boton.historial" aria-label="Ver el uso de los últimos 7 días" data-i18n-aria="boton.historialAria" aria-pressed="false">
-                <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 13.5v-4M8 13.5v-8M12.5 13.5v-11"/></svg>
-              </button>
-              <button id="boton-desglose" class="boton-icono" data-panel="desglose" type="button" title="Desglose de la semana por producto" data-i18n-title="boton.desglose" aria-label="Ver el desglose de la semana por producto" data-i18n-aria="boton.desgloseAria" aria-pressed="false">
-                <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="5.8"/><path d="M8 2.2V8h5.8"/></svg>
-              </button>
-              <button id="boton-proyeccion" class="boton-icono" data-panel="proyeccion" type="button" title="Proyección: a este ritmo..." data-i18n-title="boton.proyeccion" aria-label="Ver la proyección de uso" data-i18n-aria="boton.proyeccionAria" aria-pressed="false">
-                <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l4-4 2.8 2.8L14 5.5"/><path d="M10.5 5.5H14V9"/></svg>
-              </button>
-              <button id="boton-productos" class="boton-icono" data-panel="productos" type="button" title="Uso por producto a lo largo del tiempo" data-i18n-title="boton.productos" aria-label="Ver el uso por producto a lo largo del tiempo" data-i18n-aria="boton.productos" aria-pressed="false">
-                <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13.5h12"/><path d="M2.5 10.5c2-3 3.5-3.5 5-1.5s3 1 6-4"/><path d="M2.5 12c2.5-1.5 4-1.5 5.5-.5s3.5.5 5.5-1.5" opacity=".55"/></svg>
-              </button>
-              <button id="boton-ajustes" class="boton-icono" data-panel="ajustes" type="button" title="Ajustes" data-i18n-title="boton.ajustes" aria-label="Abrir los ajustes" data-i18n-aria="boton.ajustesAria" aria-pressed="false">
-                <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4.5h7M12.5 4.5h1M2.5 11.5h1M6.5 11.5h7"/><circle cx="11" cy="4.5" r="1.6"/><circle cx="5" cy="11.5" r="1.6"/></svg>
-              </button>
-              <span class="herramientas-separador" aria-hidden="true"></span>
-              <!-- Botón del modo compacto: cambia entre el widget normal y la versión de una sola línea. -->
-              <button id="boton-compacto" class="boton-icono" type="button" title="Vista compacta (una línea)" data-i18n-title="boton.compacto" aria-label="Cambiar entre la vista compacta y la normal" data-i18n-aria="boton.compactoAria" aria-pressed="false">
-                <svg class="icono-compactar" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1.8" y="5.4" width="12.4" height="5.2" rx="2.6"/><path d="M4.6 8h3.4"/></svg>
-                <svg class="icono-expandir" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4h11M2.5 8h11M2.5 12h11"/></svg>
-              </button>
-              <!-- Vista completa: todos los paneles a la vez. Cuatro cuadritos = "todo junto". -->
-              <button id="boton-completo" class="boton-icono" type="button" title="Vista completa (todo a la vez)" data-i18n-title="boton.completo" aria-label="Cambiar entre la vista completa y la normal" data-i18n-aria="boton.completoAria" aria-pressed="false">
-                <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="5" height="5" rx="1.2"/><rect x="9" y="2" width="5" height="5" rx="1.2"/><rect x="2" y="9" width="5" height="5" rx="1.2"/><rect x="9" y="9" width="5" height="5" rx="1.2"/></svg>
-              </button>
-              <!-- Panel de control (todos los gráficos) y vista mínima (un círculo) -->
-              <button id="boton-tablero" class="boton-icono" data-alternar="tablero" type="button" title="Panel de control (todos los gráficos)" data-i18n-title="boton.tablero" aria-label="Panel de control" data-i18n-aria="boton.tablero" aria-pressed="false">
-                <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2.5" width="12" height="11" rx="2"/><path d="M4.5 10.5l2.4-3 2 1.8 2.6-3.4"/></svg>
-              </button>
-              <button id="boton-mini" class="boton-icono" data-alternar="mini" type="button" title="Vista mínima (un círculo)" data-i18n-title="boton.mini" aria-label="Vista mínima" data-i18n-aria="boton.mini">
-                <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="4.6"/><circle cx="8" cy="8" r="1" fill="currentColor"/></svg>
-              </button>
               <!-- Disposición: columnas = "ponerlas lado a lado" (horizontal); filas = "apilarlas" (vertical). Solo en la vista normal. -->
               <button id="boton-orientacion" class="boton-icono" type="button" title="Cambiar la disposición (vertical / horizontal)" data-i18n-title="boton.orientacion" aria-label="Cambiar entre la disposición vertical y la horizontal" data-i18n-aria="boton.orientacionAria">
                 <svg class="icono-a-horizontal" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M6 3v10M10 3v10"/></svg>
                 <svg class="icono-a-vertical" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M2 6.3h12M2 9.7h12"/></svg>
+              </button>
+              <!-- Menos y más información: recorren los tamaños (mínima → compacta → normal → completa → panel de control) -->
+              <button class="boton-icono boton-tamano" data-tamano="-1" type="button" title="Menos información" data-i18n-title="boton.menos" aria-label="Menos información" data-i18n-aria="boton.menos">−</button>
+              <button class="boton-icono boton-tamano" data-tamano="1" type="button" title="Más información" data-i18n-title="boton.mas" aria-label="Más información" data-i18n-aria="boton.mas">+</button>
+              <button id="boton-ajustes" class="boton-icono" data-panel="ajustes" type="button" title="Ajustes" data-i18n-title="boton.ajustes" aria-label="Abrir los ajustes" data-i18n-aria="boton.ajustesAria" aria-pressed="false">
+                <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4.5h7M12.5 4.5h1M2.5 11.5h1M6.5 11.5h7"/><circle cx="11" cy="4.5" r="1.6"/><circle cx="5" cy="11.5" r="1.6"/></svg>
               </button>
         </div>
 

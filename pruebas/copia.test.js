@@ -198,3 +198,51 @@ test('estadísticas: sin datos no falla (todo queda vacío)', () => {
   assert.strictEqual(r.sesiones, null);
   assert.strictEqual(r.racha, 0);
 });
+
+test('el Panel: ahora mismo, semana contra la pasada, hábitos y año', () => {
+  const est = require('../src/estadisticas');
+  const HORA = 60 * 60 * 1000;
+  const ahora = new Date('2026-10-16T16:00:00');
+  const t0 = ahora.getTime();
+  const lecturasDeHoy = { dia: '2026-10-16', puntos: [[-7, 0], [-6, 1], [-3, 4], [-1, 6], [-0.5, 7], [0, 8]].map(([h, hoy]) => ({ t: t0 + h * HORA, hoy })) };
+  const sesiones = [{ inicioMs: t0 - 9 * HORA, finMs: t0 - 4 * HORA, maximo: 100, llenaMs: t0 - 5 * HORA }, { inicioMs: t0 - 30 * HORA, finMs: t0 - 25 * HORA, maximo: 40, llenaMs: null }];
+  const historial = [
+    { dia: '2026-10-13', uso: 5, limite: 14, horas: Array.from({ length: 24 }, (_, h) => (h === 9 ? 2 : h === 15 ? 3 : 0)) },
+    { dia: '2026-10-14', uso: 20, limite: 14, horas: Array.from({ length: 24 }, (_, h) => (h === 10 ? 10 : h === 21 ? 10 : 0)) },
+    { dia: '2026-10-15', uso: 6, limite: 14, horas: Array.from({ length: 24 }, (_, h) => (h === 11 ? 6 : 0)) },
+    { dia: '2026-10-16', uso: 8, limite: 14, horas: Array.from({ length: 24 }, (_, h) => (h === 9 ? 1 : h === 13 ? 7 : 0)) },
+  ];
+  const a = est.ahoraMismo({ lecturasDeHoy, hoy: 8, limite: 14, sesiones, sesion5h: { porcentaje: 30 }, historial, ahora });
+  assert.strictEqual(a.ritmo, 2);            // de 6 a 8 en la última hora
+  assert.strictEqual(a.quedaHoy, 6);
+  assert.strictEqual(a.horasParaLimite, 3);
+  assert.deepStrictEqual(a.sesionesHoy, { total: 2, agotadas: 1 });
+  assert.strictEqual(a.arranqueHoy, '10:00');
+  assert.strictEqual(a.arranqueHabitual, '10:00'); // 9, 10, 11 y 9 → 9,75 → 10
+
+  const reinicioMs = t0 + 2 * 24 * HORA;
+  const sem = est.semanaContraPasada({
+    semanaEnCurso: { reinicioMs, semana: 40, curva: [[10, 5], [100, 40]], productos: { claude_code: 30, chat: 10 }, modelos: { Fable: 20 } },
+    curvaSemanaPasada: { reinicioMs: reinicioMs - 7 * 24 * HORA, puntos: [[10, 8], [168, 70]] },
+    curvasDeModelos: { Fable: { reinicioMs, puntos: [[100, 20]], pasada: { reinicioMs: reinicioMs - 7 * 24 * HORA, puntos: [[168, 60]] } } },
+    semanasPasadas: [{ inicio: '2026-10-02', semana: 70, productos: { claude_code: 35, chat: 35 } }],
+  });
+  assert.strictEqual(sem.curvaPasada.length, 2);
+  assert.strictEqual(sem.modelos.Fable.curvaPasada.length, 1);
+  assert.strictEqual(sem.productos[0].clave, 'claude_code');
+  assert.strictEqual(sem.productos[0].cambio, 50); // del 50% del total al 75%
+
+  const h = est.habitos({ historial, limiteDiario: 14, ahora });
+  assert.deepStrictEqual(h.diaTipo, { manana: 49, tarde: 26, noche: 26 });
+  assert.strictEqual(h.diasSinUso, 26);
+  assert.strictEqual(h.mejorRacha, 2);
+
+  const an = est.anio({ semanasPasadas: [{ inicio: '2026-10-02', semana: 70, modelos: { Fable: 65 } }, { inicio: '2026-10-09', semana: 100, modelos: { Fable: 74 } }], semanaEnCurso: { semana: 11, modelos: { Fable: 13 } }, inicioSemanaMs: reinicioMs - 7 * 24 * HORA, sesiones });
+  assert.strictEqual(an.semanas.length, 3);
+  assert.strictEqual(an.semanas[2].enCurso, true);
+  assert.deepStrictEqual(an.modelos.Fable, [65, 74, 13]);
+  assert.strictEqual(an.records.semanaMax.valor, 100);
+  assert.strictEqual(an.records.pctAgotadas, 50);
+  assert.strictEqual(an.records.modelos.Fable.valor, 74);
+  assert.strictEqual(an.sesionesPorSemana[2].total, 2);
+});

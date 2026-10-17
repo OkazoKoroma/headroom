@@ -123,6 +123,12 @@ function enviarContexto(porcentaje, chat) {
   mostrar(t('alerta.contexto.titulo'), t('alerta.contexto.cuerpo', { porcentaje: formatear(porcentaje), chat: chat || 'Claude Code' }));
 }
 
+// Varios chats a la vez, en un solo aviso: "3 chats ya llevan mucho contexto: «A» 88%, «B» 81%, «C» 75%".
+function enviarContextoVarios(chats) {
+  const lista = chats.slice(0, 4).map((chat) => `«${chat.titulo || 'Claude Code'}» ${formatear(chat.porcentaje)}%`).join(', ') + (chats.length > 4 ? '…' : '');
+  mostrar(t('alerta.contexto.titulo'), t('alerta.contexto.varios', { n: chats.length, lista }));
+}
+
 // Resumen de ayer: "Ayer usaste 9% de tu cuota (límite: 14%)".
 function enviarResumenDia(uso, limite, cuenta) {
   const clave = uso > limite ? 'alerta.resumenDia.pasado' : 'alerta.resumenDia.cuerpo';
@@ -136,4 +142,5 @@ function enviarResumenSemana(semana, diaMasAlto, cuenta) {
   mostrar(conCuenta(t('alerta.resumenSemana.titulo'), cuenta), cuerpo);
 }
 
-module.exports = { enviarRitmoSemana, enviarResumenDia, enviarResumenSemana, enviarContexto, silenciarHasta, estaSilenciado, enviarVersionNueva, enviar, enviarSesion, enviarSemana, enviarProblemaDeFormato, enviarExportado };
+module.exports = {
+  enviarContextoVarios, enviarRitmoSemana, enviarResumenDia, enviarResumenSemana, enviarContexto, silenciarHasta, estaSilenciado, enviarVersionNueva, enviar, enviarSesion, enviarSemana, enviarProblemaDeFormato, enviarExportado };

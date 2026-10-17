@@ -122,7 +122,7 @@ function dibujarLimitesExtra(extras) {
         <div class="medidor-texto">
           <span class="etiqueta-con-boton">
             <span class="etiqueta"></span>
-            <span class="porcentaje" id="extra-${i}-porcentaje"></span>
+            <span class="porcentaje"><span id="extra-${i}-porcentaje"></span><small class="porcentaje-sufijo porcentaje-signo">%</small></span>
             <span class="comparacion" id="extra-${i}-comparacion"></span>
           </span>
           <span class="detalle" id="extra-${i}-detalle"></span>
@@ -135,7 +135,7 @@ function dibujarLimitesExtra(extras) {
   }
   lista.forEach((extra, i) => {
     pintarBarra(`extra-${i}-relleno`, extra.porcentaje);
-    animarNumero(`extra-${i}-porcentaje`, extra.porcentaje, (v) => `${formatear(v)}%`);
+    animarNumero(`extra-${i}-porcentaje`, extra.porcentaje, (v) => formatear(v)); // (el % va aparte, chico)
     // Los límites por modelo muestran cuándo se reinician; el crédito extra, cuánto se gastó ("US$16 / US$50")
     ponerAyuda(`extra-${i}-relleno`, extra.detalleTexto !== undefined ? t('ayuda.credito') : t('ayuda.modelo', { nombre: extra.nombre }));
     pintarComparacion(extra.comparacion || null, `extra-${i}`, ''); // contra la semana anterior de ese modelo
@@ -270,18 +270,15 @@ function ponerAyudasDeLasBarras(uso) {
 // Devuelve { corto: '▲ 12', frase: 'Vas 12 puntos por encima...', tono } (o null si no hay con qué comparar).
 function textosDeLaComparacion(c, contra = '') {
   if (!c || !Number.isFinite(c.diferencia)) return null;
-  const puntos = Math.abs(c.diferencia);
-  // Se dice en porcentaje: cuánto más (o menos) que antes. "Ibas en 10% y vas en 13%" = un 30% más.
-  // (si antes ibas en 0, no hay porcentaje que valga: no se compara)
-  if (!(c.antes > 0) && puntos >= 1) return null;
-  const porcentaje = c.antes > 0 ? Math.round((puntos / c.antes) * 100) : 0;
-  const valores = { n: formatear(porcentaje), antes: formatear(c.antes) };
+  // Siempre en puntos de la cuota: "▲ +6 pts". (Un porcentaje sobre lo que llevabas se dispara cuando ibas casi en 0.)
+  const puntos = Math.round(Math.abs(c.diferencia));
   const tipo = puntos < 1 ? 'igual' : c.diferencia > 0 ? 'arriba' : 'abajo';
-  const frase = t(`comp.${contra}${tipo}`, valores) + (c.aproximado ? ' ' + t('comp.aprox') : '');
+  const referencia = t(`comp.ref.${contra ? contra.replace('.', '') : 'semana'}`);
+  const valores = { n: formatear(puntos), antes: formatear(c.antes), ref: referencia };
   return {
-    corto: tipo === 'igual' ? '=' : `${tipo === 'arriba' ? '▲' : '▼'} ${formatear(porcentaje)}%`,
-    linea: t(`comp.${contra}corto.${tipo}`, valores),
-    frase,
+    corto: tipo === 'igual' ? '=' : `${tipo === 'arriba' ? '▲ +' : '▼ −'}${formatear(puntos)} pts`,
+    linea: t(`comp.pts.linea.${tipo}`, valores),
+    frase: t(`comp.pts.${tipo}`, valores) + (c.aproximado ? ' ' + t('comp.aprox') : ''),
     tono: tipo === 'arriba' ? AMARILLO : tipo === 'abajo' ? VERDE : 'var(--texto-suave)',
   };
 }
@@ -311,6 +308,7 @@ function mostrarUso(datos) {
 
   // Las cuentas: la pestañita, el panel y el resumen de la vista completa.
   panelCuentas.mostrar(datos);
+  dibujarPastillasDeCuentas(datos);
   if (cuentaMostrada !== null && datos.activa !== cuentaMostrada && panelActual === 'ajustes') {
     panelAjustes.cargar(); // los límites de Ajustes son de la cuenta que se muestra: se cargan los de la nueva
   }
@@ -330,8 +328,10 @@ function mostrarUso(datos) {
     pintarBarra('relleno-hoy', null);
     escribirDetalle('hoy-detalle', '—');
     escribirDetalle('hoy-detalle-corto', '');
-    document.getElementById('hoy-porcentaje').textContent = '';
-    delete valoresMostrados['hoy-porcentaje'];
+    escribirDetalle('hoy-detalle-franja', '');
+    document.getElementById('hoy-numero').textContent = '';
+    document.getElementById('hoy-de').textContent = '';
+    delete valoresMostrados['hoy-numero'];
     pintarBarra('relleno-semana', null);
     pintarBarra('relleno-sesion', null);
     escribirDetalle('semana-detalle', error ? `⚠ ${error}` : t('lectura.cargando'), Boolean(error));
@@ -353,24 +353,25 @@ function mostrarUso(datos) {
   document.getElementById('hoy-detalle').classList.remove('aviso');
   animarNumero('hoy-detalle', uso.hoy, (v) => t('hoy.de', { hoy: formatear(v), limite: formatear(uso.limiteDiario) }));
   // La tarjeta vertical: el número grande aparte y, al lado, el límite y (si se puede estimar) a qué hora llegarías a él
-  animarNumero('hoy-porcentaje', uso.hoy, (v) => `${formatear(v)}%`);
+  animarNumero('hoy-numero', uso.hoy, (v) => formatear(v));
+  document.getElementById('hoy-de').textContent = '% ' + t('hoy.de.corto', { limite: formatear(uso.limiteDiario) }); // "% de 14%", chico, junto al número
   const diaria = uso.proyeccion && uso.proyeccion.diaria;
-  escribirDetalle('hoy-detalle-corto', diaria && diaria.tipo === 'llegaras'
-    ? t('hoy.de.proy', { limite: formatear(uso.limiteDiario), hora: diaria.cuandoTexto })
-    : t('hoy.de.corto', { limite: formatear(uso.limiteDiario) }));
+  escribirDetalle('hoy-detalle-corto', diaria && diaria.tipo === 'llegaras' ? t('hoy.limite.hacia', { hora: diaria.cuandoTexto }) : '');
+  // (en las vistas en franja: el límite y la hora van juntos debajo del número)
+  escribirDetalle('hoy-detalle-franja', t('hoy.de.corto', { limite: formatear(uso.limiteDiario) }) + (diaria && diaria.tipo === 'llegaras' ? ` · ${t('hoy.limite.corto', { hora: diaria.cuandoTexto })}` : ''));
 
   // Semana: la barra, el porcentaje en número (junto a la etiqueta) y la hora de reinicio.
   pintarComparacion(uso.comparacion);
   pintarComparacion(uso.comparacionHoy, 'hoy');
   pintarComparacion(uso.sesion5h ? uso.comparacionSesion : null, 'sesion');
   pintarBarra('relleno-semana', uso.semana);
-  animarNumero('semana-porcentaje', uso.semana, (v) => `${formatear(v)}%`);
+  animarNumero('semana-porcentaje', uso.semana, (v) => formatear(v)); // (el % va aparte, chico)
   escribirReinicio('semana-detalle', uso.reinicioTexto, uso.reinicio);
 
   // Sesión de 5 horas (si claude.ai no la entrega, la barra queda vacía)
   if (uso.sesion5h) {
     pintarBarra('relleno-sesion', uso.sesion5h.porcentaje);
-    animarNumero('sesion-porcentaje', uso.sesion5h.porcentaje, (v) => `${formatear(v)}%`);
+    animarNumero('sesion-porcentaje', uso.sesion5h.porcentaje, (v) => formatear(v));
     escribirReinicio('sesion-detalle', uso.sesion5h.reinicioTexto, uso.sesion5h.reinicio);
   } else {
     pintarBarra('relleno-sesion', null);
@@ -436,6 +437,7 @@ let panelActual = null;        // 'historial', 'desglose', 'proyeccion', 'ajuste
 // En la ventana de una parte (historial, desglose o proyección), ese panel está siempre abierto.
 if (PARTE) {
   document.body.classList.add('parte', `parte-${PARTE}`);
+  if (PARTE.startsWith('pnl-')) document.body.classList.add('parte-pnl'); // una franja del Panel en su propia ventana
   if (PARTES_DE_PANEL.includes(PARTE)) {
     panelActual = PARTE;
     document.body.classList.add('panel-abierto');
@@ -701,78 +703,240 @@ document.getElementById('guardar-informe').addEventListener('click', async () =>
   }
 });
 
-// ----- Panel de control: las fichas con los números y ocho gráficos, debajo de la vista completa -----
+// ----- El Panel: cuatro preguntas (ahora, la semana, los hábitos y el año), debajo de la vista completa -----
 const esTablero = () => document.body.classList.contains('tablero');
+// El Panel se dibuja en la vista Panel, o en la ventana propia de una de sus franjas
+const tableroALaVista = () => (PARTE ? PARTE.startsWith('pnl-') : esTablero());
 const ALTO_DEL_TABLERO = 368; // lo que ocupa esa sección con su separación (igual que en widget.css y en main.js)
 let turnoDelTablero = 0;      // si llegan dos pedidos seguidos, solo se dibuja el último
+const HORA_MS = 60 * 60 * 1000;
+const DIA_MS = 24 * HORA_MS;
+const AZUL_CLARO = '#5fa8e8';  // (los mismos azul y morado que usan Chats y Cowork)
+const VIOLETA = '#a78bfa';
 
 async function dibujarTablero() {
-  if (!esTablero() || PARTE) return;
+  if (!tableroALaVista()) return;
   const turno = ++turnoDelTablero;
-  const lugar = (id) => ({
-    grafico: document.getElementById(`tablero-${id}-grafico`),
-    contenedor: document.getElementById(`tablero-${id}`),
-    leyenda: document.getElementById(`tablero-${id}-leyenda`),
-  });
-  const [hoy, dias, horas, productosHoy, productosSemana, semanas, numeros] = await Promise.all([
-    window.widget.obtenerHistorial(1), window.widget.obtenerHistorial(30), window.widget.obtenerHistorial('horas'),
-    window.widget.obtenerProductos('1'), window.widget.obtenerProductos('semana'), window.widget.obtenerProductos('semanas'),
-    window.widget.obtenerEstadisticas(),
-  ]);
-  if (!esTablero() || turno !== turnoDelTablero) return;
-  dibujarGraficoDelDia(hoy, lugar('hoy'));
-  dibujarGraficoDeDias(dias, lugar('dias'));
-  dibujarGraficoDeHoras(horas, lugar('horas'));
-  dibujarProductosEn(productosHoy, lugar('prod-hoy'));
-  dibujarProductosEn(productosSemana, lugar('prod-semana'));
-  dibujarProductosEn(semanas, lugar('semanas'));
-  pintarPorDiaDeSemana(numeros, lugar('por-dia'));
-  pintarMapa(numeros, document.getElementById('tablero-mapa'));
-  pintarNumerosDelTablero({ hoy, horas, productosHoy, productosSemana, semanas, numeros });
-}
-
-// El número grande de cada gráfico del panel de control (y, en chico, qué es), con lo que ya se trajo para dibujarlo.
-function pintarNumerosDelTablero({ horas, productosHoy, productosSemana, semanas, numeros }) {
-  const porcentaje = (valor) => `${formatear(Math.round(valor * 10) / 10)}%`;
+  const datos = await window.widget.obtenerPanel();
+  if (!tableroALaVista() || turno !== turnoDelTablero) return;
+  const uso = ultimosDatos && ultimosDatos.uso;
+  const porcentaje = (v) => `${formatear(Math.round(v * 10) / 10)}%`;
   const poner = (id, grande, chico) => {
-    const sitio = document.getElementById(`tablero-${id}-numero`);
-    sitio.replaceChildren(crear('b', '', grande), crear('small', '', chico));
+    document.getElementById(`pnl-${id}-num`).textContent = grande;
+    document.getElementById(`pnl-${id}-det`).textContent = chico || '';
   };
   const faltan = (id) => poner(id, '—', t('est.faltan'));
-  const uso = ultimosDatos && ultimosDatos.uso;
-  // Hoy: cuánto llevas de tu límite
-  if (uso) poner('hoy', porcentaje(uso.hoy), t('hoy.de.corto', { limite: formatear(uso.limiteDiario) }));
-  else faltan('hoy');
-  // Por producto (hoy y esta semana): el que más usó
-  const mayor = (datos) => {
-    const candidatos = (datos && datos.productos ? datos.productos : []).filter((p) => !p.propio)
-      .map((p) => ({ nombre: nombreDeProducto(p), valor: [...p.puntos].reverse().find((punto) => punto[1] !== null) }))
-      .filter((p) => p.valor && p.valor[1] > 0);
-    return candidatos.sort((a, b) => b.valor[1] - a.valor[1])[0] || null;
+  const lugar = (id) => ({ grafico: document.getElementById(`pnl-${id}-graf`), contenedor: document.getElementById(`pnl-${id}-col`), leyenda: document.getElementById(`pnl-${id}-leyenda`) });
+  const mostrar = (id, si) => { document.getElementById(`pnl-${id}`).hidden = !si; };
+  const fechaCorta = (dia) => new Date(`${dia}T12:00:00Z`).toLocaleDateString(localeActual, { day: 'numeric', month: 'short', timeZone: 'UTC' });
+  const est = datos.estadisticas;
+  const [nombreModelo, modelo] = Object.entries(datos.modelos)[0] || [null, null];
+
+  // --- ¿Cómo voy ahora?
+  const a = datos.ahora;
+  if (a.ritmo !== null) poner('ritmo', `${formatear(a.ritmo)} %/h`, a.ritmoMedio !== null ? t('pnl.ritmo.det', { ritmo: formatear(a.ritmoMedio) }) : t('pnl.ultimaHora'));
+  else faltan('ritmo');
+  if (a.quedaHoy !== null) poner('queda', `${t('pnl.pts', { n: formatear(a.quedaHoy) })}${a.horasParaLimite !== null ? ` · ~${formatear(a.horasParaLimite)} h` : ''}`, t('pnl.queda.det', { limite: formatear(datos.limite) }));
+  else faltan('queda');
+  poner('sesiones', String(a.sesionesHoy.total), `${t('pnl.agotadas', { n: a.sesionesHoy.agotadas })}${uso && uso.sesion5h ? ' · ' + t('pnl.sesionActual', { p: formatear(uso.sesion5h.porcentaje) }) : ''}`);
+  if (a.arranqueHoy) poner('arranque', a.arranqueHoy, a.arranqueHabitual ? t('pnl.arranque.det', { hora: a.arranqueHabitual }) : '');
+  else faltan('arranque');
+
+  // --- ¿Cómo va la semana?
+  const sem = datos.semana;
+  document.getElementById('pnl-semana-nota').textContent = datos.inicioSemanaMs ? t('pnl.semana.nota', { dia: new Date(datos.inicioSemanaMs).toLocaleDateString(localeActual, { weekday: 'long', hour: '2-digit', minute: '2-digit' }) }) : '';
+  const marcasDeSemana = datos.inicioSemanaMs
+    ? [0, 1, 2, 3, 4, 5, 6].map((k) => { const fecha = new Date(datos.inicioSemanaMs + k * DIA_MS); return { x: k * 24, texto: fecha.toLocaleDateString(localeActual, { weekday: 'short' }).replace('.', ''), destacada: fecha.toDateString() === new Date().toDateString() }; })
+    : [];
+  const contraLaPasada = (id, esta, pasada, color, comparacion, contra = '') => {
+    dibujarLineas({
+      series: [
+        ...(pasada ? [{ nombre: t('pnl.pasada'), color: 'var(--texto-suave)', punteada: true, relleno: false, puntos: pasada }] : []),
+        { nombre: t('pnl.esta'), color, relleno: true, puntos: esta },
+      ],
+      marcas: marcasDeSemana, limites: [], desde: 0, hasta: 168, numeroEn: 'final', vacio: t('est.faltan'), en: lugar(id),
+    });
+    const textos = textosDeLaComparacion(comparacion, contra);
+    poner(id, textos ? textos.corto : '—', textos ? t('pnl.altura') : (pasada ? '' : t('pnl.sinPasada')));
   };
-  for (const [id, datos] of [['prod-hoy', productosHoy], ['prod-semana', productosSemana], ['semanas', semanas]]) {
-    const top = mayor(datos);
-    if (top) poner(id, porcentaje(top.valor[1]), top.nombre);
-    else faltan(id);
+  contraLaPasada('semvs', sem.curvaEsta, sem.curvaPasada, 'var(--acento)', uso && uso.comparacion);
+  mostrar('fablevs', Boolean(nombreModelo));
+  if (nombreModelo) {
+    document.getElementById('pnl-fablevs-tit').textContent = t('pnl.fableVs', { nombre: nombreModelo });
+    const curvas = sem.modelos[nombreModelo] || { curvaEsta: [], curvaPasada: null };
+    contraLaPasada('fablevs', curvas.curvaEsta, curvas.curvaPasada, AMARILLO, modelo.comparacion);
   }
-  // Horas de más uso: la hora pico de la cuenta que se muestra
-  const cuenta = horas && horas.cuentas && horas.cuentas[0];
-  const pico = cuenta && cuenta.dias > 0 && cuenta.horas.some((v) => v > 0) ? cuenta.horas.indexOf(Math.max(...cuenta.horas)) : -1;
-  if (pico >= 0) poner('horas', `${String(pico).padStart(2, '0')}–${String(pico + 1).padStart(2, '0')} h`, t('tablero.pico'));
-  else faltan('horas');
-  // Últimos 30 días: el promedio por día (y el más alto)
-  if (numeros.promedio !== null) poner('dias', porcentaje(numeros.promedio), `${t('tablero.porDia')}${numeros.masAlto ? ` · ${porcentaje(numeros.masAlto.uso)} ${t('tablero.masAlto')}` : ''}`);
-  else faltan('dias');
-  // Por día de la semana: tu día más alto (y la racha)
-  const valores = numeros.porDiaSemana || [];
+  // Cómo terminarías: la proyección de la semana (y la del modelo)
+  const proyeccion = uso && uso.proyeccion ? textosDeLaProyeccionSemanal(uso.proyeccion.semanal, uso.reinicioTexto) : null;
+  const fin = uso && uso.proyeccion && uso.proyeccion.semanal;
+  const ultimo = sem.curvaEsta[sem.curvaEsta.length - 1];
+  const proyectada = ultimo && ultimo[0] > 3 && ultimo[1] > 0
+    ? [ultimo, [168, Math.min(100, ultimo[1] + (ultimo[1] / ultimo[0]) * (168 - ultimo[0]))]]
+    : null;
+  dibujarLineas({
+    series: [
+      ...(proyectada ? [{ nombre: t('pnl.proyeccion'), color: VERDE, punteada: true, relleno: false, puntos: proyectada }] : []),
+      { nombre: t('pnl.esta'), color: VERDE, relleno: true, puntos: sem.curvaEsta },
+    ],
+    marcas: marcasDeSemana, limites: [[0, 100]], desde: 0, hasta: 168, numeroEn: 'final', vacio: t('est.faltan'), en: lugar('fin'),
+  });
+  if (fin && fin.tipo === 'no-llegaras') poner('fin', `~${porcentaje(fin.fin)}`, `${t('pnl.semanaCorta')} · ${t('est.sobra').toLowerCase()}: ~${formatear(Math.round(100 - fin.fin))}`);
+  else if (fin && fin.tipo === 'llegaras') poner('fin', '100%', proyeccion ? proyeccion.titulo : '');
+  else if (fin && fin.tipo === 'ya-llegaste') poner('fin', '100%', proyeccion ? proyeccion.titulo : '');
+  else faltan('fin');
+  if (nombreModelo && modelo.proyeccion && modelo.proyeccion.tipo === 'no-llegaras') {
+    document.getElementById('pnl-fin-det').textContent += ` · ${t('pnl.fin.det', { nombre: nombreModelo, fin: formatear(Math.round(modelo.proyeccion.fin)) })}`;
+  }
+  // Por producto: la barra repartida y la lista con qué crece y qué baja
+  const stack = document.getElementById('pnl-prod-stack');
+  const lista = document.getElementById('pnl-prod-lista');
+  stack.replaceChildren();
+  lista.replaceChildren();
+  const total = sem.productos.reduce((suma, p) => suma + p.valor, 0);
+  sem.productos.forEach((p, i) => {
+    const color = COLORES_POR_PRODUCTO[p.clave] || COLORES_DE_REPUESTO[i % COLORES_DE_REPUESTO.length];
+    const tramo = crear('i', '');
+    tramo.style.width = `${total > 0 ? (p.valor / total) * 100 : 0}%`;
+    tramo.style.background = color;
+    stack.appendChild(tramo);
+    const fila = crear('div', 'pnl-prod-fila');
+    const punto = crear('i', '');
+    punto.style.background = color;
+    const nombre = crear('span', 'pnl-prod-nombre', nombreDeProducto({ clave: p.clave, nombre: datos.nombresDeProductos[p.clave] || p.clave }));
+    const valor = crear('b', 'pnl-prod-valor', p.parte === null ? '—' : porcentaje(p.parte));
+    if (p.cambio !== null && Math.abs(p.cambio) >= 1) {
+      const cambio = crear('span', 'comp', `${p.cambio > 0 ? '▲' : '▼'} ${formatear(Math.abs(p.cambio))}%`);
+      cambio.style.color = p.cambio > 0 ? AMARILLO : VERDE;
+      valor.append(' ', cambio);
+    }
+    fila.append(punto, nombre, valor);
+    lista.appendChild(fila);
+  });
+  const mayor = sem.productos[0];
+  if (mayor && total > 0) {
+    const nombre = nombreDeProducto({ clave: mayor.clave, nombre: datos.nombresDeProductos[mayor.clave] || mayor.clave });
+    poner('prod', porcentaje(mayor.parte), `${nombre}${mayor.cambio !== null && Math.abs(mayor.cambio) >= 1 ? ' · ' + t(mayor.cambio > 0 ? 'pnl.crece' : 'pnl.baja', { n: formatear(Math.abs(mayor.cambio)) }) : ''}`);
+  } else faltan('prod');
+
+  // --- ¿Cuándo y cómo uso Claude?
+  pintarMapa(est, document.getElementById('pnl-mapa-col'));
+  if (est.sesiones && est.sesiones.horaTipica !== null) poner('mapa', `${String(est.sesiones.horaTipica).padStart(2, '0')}:00`, t('pnl.agotasA'));
+  else poner('mapa', '—', est.mapa ? '' : t('est.faltan'));
+  pintarPorDiaDeSemana(est, lugar('pordia'));
+  const valores = est.porDiaSemana || [];
   const indice = valores.reduce((mejor, v, n) => (v !== null && (mejor < 0 || v > valores[mejor]) ? n : mejor), -1);
-  if (indice >= 0) poner('por-dia', nombreCortoDelDia(indice), `${t('tablero.diaMasAlto')} · ${t('est.racha').toLowerCase()}: ${t('est.dias', { n: numeros.racha })}`);
-  else faltan('por-dia');
-  // El mapa: a qué hora sueles agotar la sesión (y cuántas se agotaron)
-  if (numeros.sesiones) {
-    const hora = numeros.sesiones.horaTipica !== null ? `${String(numeros.sesiones.horaTipica).padStart(2, '0')}:00` : '—';
-    poner('mapa', hora, `${t('est.horaAgota').toLowerCase()} · ${t('est.sesiones').toLowerCase()}: ${numeros.sesiones.agotadas7} / ${numeros.sesiones.total7} ${t('est.en7')}`);
-  } else faltan('mapa');
+  if (indice >= 0) poner('pordia', nombreCortoDelDia(indice), t('tablero.diaMasAlto'));
+  else faltan('pordia');
+  const h = datos.habitos;
+  const tramos = document.getElementById('pnl-diatipo-tramos');
+  const etiquetas = document.getElementById('pnl-diatipo-etq');
+  tramos.replaceChildren();
+  etiquetas.replaceChildren();
+  if (h.diaTipo) {
+    const partes = [['manana', h.diaTipo.manana, AZUL_CLARO], ['tarde', h.diaTipo.tarde, 'var(--acento)'], ['noche', h.diaTipo.noche, VIOLETA]];
+    for (const [clave, valor, color] of partes) {
+      const tramo = crear('i', ''); tramo.style.width = `${valor}%`; tramo.style.background = color; tramos.appendChild(tramo);
+      etiquetas.appendChild(crear('span', '', `${valor}% ${t(`pnl.${clave}`)}`));
+    }
+    const top = partes.reduce((m, p) => (p[1] > m[1] ? p : m), partes[0]);
+    poner('diatipo', `${top[1]}%`, t('pnl.porLa', { tramo: t(`pnl.${top[0]}`) }));
+  } else faltan('diatipo');
+  poner('racha', t('est.dias', { n: est.racha }), h.mejorRacha > est.racha ? t('pnl.mejorRacha', { n: h.mejorRacha }) : '');
+  if (est.sugerido) poner('sugerido', porcentaje(est.sugerido.limite), t('est.sugerido.detalle', { n: est.sugerido.diasPorSemana }));
+  else faltan('sugerido');
+  if (est.sesiones) poner('agotadas', `${est.sesiones.agotadas7} / ${est.sesiones.total7}`, t('est.en7'));
+  else faltan('agotadas');
+  poner('sinuso', String(h.diasSinUso), t('est.de30'));
+
+  // --- ¿Cómo voy en el año?
+  const an = datos.anio;
+  const colorDeSemana = (v, enCurso) => (v >= 100 ? ROJO : v >= 80 ? AMARILLO : VERDE);
+  const marcasDeSemanas = an.semanas.map((se, i) => ({ i, texto: se.enCurso ? t('pnl.esta') : (i % 4 === 0 ? fechaCorta(se.inicio) : '') }));
+  document.getElementById('pnl-semanas-tit').textContent = t('pnl.semanasFin', { n: an.semanas.length });
+  if (an.semanas.length) {
+    dibujarBarras({ valores: an.semanas.map((se) => ({ valor: se.semana, color: colorDeSemana(se.semana), tenue: se.enCurso })), marcas: marcasDeSemanas, linea: an.promedio, tope: 100, en: lugar('semanas') });
+    const agotadas = an.semanas.filter((se) => !se.enCurso && se.semana >= 100).length;
+    if (an.promedio !== null) poner('semanas', porcentaje(an.promedio), t('pnl.promedioAgotadas', { n: agotadas }));
+    else poner('semanas', porcentaje(an.semanas[an.semanas.length - 1].semana), t('pnl.esta'));
+  } else { dibujarBarras({ valores: [], en: lugar('semanas') }); faltan('semanas'); }
+  mostrar('fablesem', Boolean(nombreModelo));
+  if (nombreModelo) {
+    document.getElementById('pnl-fablesem-tit').textContent = t('pnl.fableFin', { nombre: nombreModelo, n: an.semanas.length });
+    const valores = an.modelos[nombreModelo] || [];
+    const conDato = valores.filter((v) => v !== null);
+    dibujarBarras({ valores: valores.map((v, i) => ({ valor: v, color: v !== null && v >= 100 ? ROJO : AMARILLO, tenue: an.semanas[i] && an.semanas[i].enCurso })), marcas: marcasDeSemanas, linea: conDato.length ? conDato.reduce((x, y) => x + y, 0) / conDato.length : null, tope: 100, en: lugar('fablesem') });
+    const terminadas = valores.slice(0, -1).filter((v) => v !== null);
+    if (terminadas.length) poner('fablesem', porcentaje(terminadas.reduce((x, y) => x + y, 0) / terminadas.length), t('pnl.promedioAgotadas', { n: terminadas.filter((v) => v >= 100).length }));
+    else faltan('fablesem');
+  }
+  // Mes a mes
+  const meses = est.porMes || [];
+  dibujarLineas({
+    series: [{ nombre: t('est.promedio'), color: AZUL_CLARO, relleno: true, puntos: meses.map((m, i) => [i, m.promedio]) }],
+    marcas: meses.map((m, i) => ({ x: i, texto: new Date(`${m.mes}-15T12:00:00Z`).toLocaleDateString(localeActual, { month: 'short', timeZone: 'UTC' }).replace('.', '') })),
+    limites: [], desde: 0, hasta: Math.max(1, meses.length - 1), conPuntos: true, numeroEn: 'final', vacio: t('est.faltan'), en: lugar('meses'),
+  });
+  const ultimoMes = meses[meses.length - 1];
+  if (ultimoMes) poner('meses', porcentaje(ultimoMes.promedio), t('pnl.porDiaEn', { mes: new Date(`${ultimoMes.mes}-15T12:00:00Z`).toLocaleDateString(localeActual, { month: 'long', timeZone: 'UTC' }) }));
+  else faltan('meses');
+  // Sesiones agotadas por semana
+  const porSemana = an.sesionesPorSemana;
+  document.getElementById('pnl-sessem-tit').textContent = t('pnl.sesionesSemana', { n: porSemana.length });
+  if (porSemana.length) {
+    const maximo = Math.max(1, ...porSemana.map((x) => x.agotadas));
+    const promedioAgotadas = porSemana.length > 1 ? porSemana.slice(0, -1).reduce((x, y) => x + y.agotadas, 0) / (porSemana.length - 1) : null;
+    dibujarBarras({ valores: porSemana.map((x, i) => ({ valor: x.agotadas, color: x.agotadas >= 5 ? ROJO : x.agotadas >= 3 ? AMARILLO : VERDE, tenue: an.semanas[i] && an.semanas[i].enCurso })), marcas: marcasDeSemanas, linea: promedioAgotadas, tope: Math.max(maximo, 1), en: lugar('sessem') });
+    poner('sessem', String(porSemana[porSemana.length - 1].agotadas), promedioAgotadas !== null ? t('pnl.estaSemana', { n: formatear(Math.round(promedioAgotadas * 10) / 10) }) : t('pnl.esta'));
+  } else { dibujarBarras({ valores: [], en: lugar('sessem') }); faltan('sessem'); }
+  // Récords
+  if (est.masAlto) poner('masalto', porcentaje(est.masAlto.uso), new Date(`${est.masAlto.dia}T12:00:00Z`).toLocaleDateString(localeActual, { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }));
+  else faltan('masalto');
+  const rec = an.records;
+  if (rec) {
+    poner('semmax', `${porcentaje(rec.semanaMax.valor)} · ${porcentaje(rec.semanaMin.valor)}`, `${t('pnl.semDel', { fecha: fechaCorta(rec.semanaMax.inicio) })} · ${t('pnl.semDel', { fecha: fechaCorta(rec.semanaMin.inicio) })}`);
+    poner('pctagot', `${rec.pctAgotadas}%`, t('pnl.deN', { a: Math.round((rec.pctAgotadas / 100) * (an.semanas.length - 1)), n: an.semanas.length - 1 }));
+  } else { faltan('semmax'); faltan('pctagot'); }
+  mostrar('fablemax', Boolean(nombreModelo));
+  if (nombreModelo) {
+    document.querySelector('#pnl-fablemax .pnl-etq').textContent = t('pnl.fableMax', { nombre: nombreModelo });
+    const top = rec && rec.modelos ? rec.modelos[nombreModelo] : null;
+    if (top) poner('fablemax', porcentaje(top.valor), t('pnl.semDel', { fecha: fechaCorta(top.inicio) }));
+    else faltan('fablemax');
+  }
+}
+
+// Barras verticales simples (una por semana): "valores" [{ valor, color, tenue }], "marcas" [{ i, texto }], "linea" (el promedio,
+// punteado) y "tope" (el 100%). Dibuja con el tamaño de su contenedor.
+function dibujarBarras({ valores, marcas = [], linea = null, tope = 100, en }) {
+  const { contenedor } = en;
+  contenedor.replaceChildren();
+  if (!valores.length) { contenedor.appendChild(crear('p', 'grafico-vacio', t('est.faltan'))); return; }
+  const anchoTotal = Math.max(120, contenedor.clientWidth || 260);
+  const altoTotal = Math.max(44, contenedor.clientHeight || 70);
+  const ABAJO = 14;
+  const alto = altoTotal - ABAJO - 2;
+  const maximo = Math.max(tope, ...valores.map((v) => v.valor || 0)) * 1.05;
+  const hueco = 3;
+  const anchoDeBarra = (anchoTotal - hueco * (valores.length - 1)) / valores.length;
+  const svg = elementoSvg('svg', { class: 'grafico-dia grafico-barras', width: anchoTotal, height: altoTotal });
+  valores.forEach((v, i) => {
+    if (v.valor === null || v.valor === undefined) return;
+    const h = Math.max(1, (v.valor / maximo) * alto);
+    const barra = elementoSvg('rect', { x: (i * (anchoDeBarra + hueco)).toFixed(1), y: (2 + alto - h).toFixed(1), width: anchoDeBarra.toFixed(1), height: h.toFixed(1), rx: 2, fill: v.color }, svg);
+    if (v.tenue) { barra.setAttribute('fill', 'none'); barra.setAttribute('stroke', v.color); barra.setAttribute('stroke-width', '1.5'); barra.setAttribute('stroke-dasharray', '3 2'); }
+  });
+  if (linea !== null && Number.isFinite(linea)) {
+    const y = (2 + alto - (linea / maximo) * alto).toFixed(1);
+    elementoSvg('line', { x1: 0, x2: anchoTotal, y1: y, y2: y, class: 'linea-limite' }, svg);
+  }
+  elementoSvg('line', { x1: 0, x2: anchoTotal, y1: (2 + alto).toFixed(1), y2: (2 + alto).toFixed(1), class: 'eje' }, svg);
+  for (const marca of marcas) {
+    if (!marca.texto) continue;
+    const x = marca.i * (anchoDeBarra + hueco) + anchoDeBarra / 2;
+    const texto = elementoSvg('text', { x: Math.min(anchoTotal - 2, Math.max(2, x)).toFixed(1), y: altoTotal - 2, class: 'hora', 'text-anchor': marca.i === valores.length - 1 ? 'end' : marca.i === 0 ? 'start' : 'middle' }, svg);
+    texto.textContent = marca.texto;
+  }
+  contenedor.appendChild(svg);
 }
 
 // Pone cada elemento en su tamaño final: [[elemento, 'height' o 'width', valor], ...].
@@ -888,7 +1052,8 @@ function curvaSuave(puntos) {
 //   vacio      → el texto si todavía no hay datos
 //   en         → dónde dibujar: { grafico, contenedor, leyenda } (si no se dice, en el historial)
 //   numeroEn   → 'final' (el número va al final de la línea) o 'maximo' (va sobre el punto más alto)
-function dibujarLineas({ series, desde, hasta, marcas, limites, ahora = null, conPuntos = false, vacio, en = null, numeroEn = 'final' }) {
+//   ultimoEnCurso → true: el último tramo de cada línea va punteado (el último punto es hoy o la semana en curso, que van a medias)
+function dibujarLineas({ series, desde, hasta, marcas, limites, ahora = null, conPuntos = false, vacio, en = null, numeroEn = 'final', ultimoEnCurso = false }) {
   const grafico = en ? en.grafico : document.querySelector('#vista-historial .grafico');
   grafico.classList.add('del-dia');
   grafico.classList.remove('largo');
@@ -983,9 +1148,19 @@ function dibujarLineas({ series, desde, hasta, marcas, limites, ahora = null, co
       if (valor === null) { if (tramos[tramos.length - 1].length) tramos.push([]); continue; }
       tramos[tramos.length - 1].push([x(px), y(valor), valor]);
     }
-    for (const tramo of tramos) {
-      if (tramo.length === 0) continue;
+    const ultimoConDatos = tramos.filter((tramo) => tramo.length).pop();
+    for (const tramoCompleto of tramos) {
+      if (tramoCompleto.length === 0) continue;
       hayPuntos = true;
+      // El último tramo "en curso": se dibuja hasta el penúltimo punto, y de ahí al último, punteado
+      const enCurso = ultimoEnCurso && tramoCompleto === ultimoConDatos && tramoCompleto.length >= 2;
+      const tramo = enCurso ? tramoCompleto.slice(0, -1) : tramoCompleto;
+      if (enCurso) {
+        const [a, b] = tramoCompleto.slice(-2);
+        elementoSvg('path', { d: `M${a[0].toFixed(1)} ${a[1].toFixed(1)} L${b[0].toFixed(1)} ${b[1].toFixed(1)}`, class: 'serie punteada en-curso', stroke: serie.color }, svg);
+        if (conPuntos) elementoSvg('circle', { cx: b[0], cy: b[1], r: 2.2, fill: serie.color }, svg);
+      }
+      if (tramo.length === 1 && enCurso) continue;
       const d = curvaSuave(tramo.map(([px, py]) => [px, py]));
       if (serie.relleno && tramo.length > 1) {
         const ultimo = tramo[tramo.length - 1];
@@ -1273,7 +1448,9 @@ const observadorDeTamano = new ResizeObserver((cambios) => {
 });
 observadorDeTamano.observe(document.getElementById('columnas'));
 observadorDeTamano.observe(document.getElementById('productos-columnas'));
-observadorDeTamano.observe(document.getElementById('tablero-hoy')); // (las seis celdas del panel de control miden lo mismo)
+observadorDeTamano.observe(document.getElementById('pnl-semvs-col')); // (el Panel: todos sus gráficos cambian de ancho a la vez)
+// (en la ventana propia de una franja, se mira un gráfico de esa franja)
+for (const id of ['pnl-pordia-col', 'pnl-semanas-col']) observadorDeTamano.observe(document.getElementById(id));
 
 // --- Uso por producto a lo largo del tiempo ---
 // Una línea por producto (con el color de siempre: Claude Code naranja, Chats azul...). Eje Y: % de la cuota semanal que usó.
@@ -1333,14 +1510,14 @@ function dibujarProductosEn(datos, en) {
       : producto.puntos,
   }));
   if (datos.semanas) {
-    // Eje X: las semanas (por el día en que empezó cada una); la última es la semana en curso
+    // Eje X: las semanas (por el día en que empezó cada una); la última es la semana en curso (va punteada)
     const marcas = datos.semanas.map((semana, j) => ({
       x: j,
       texto: semana.enCurso ? t('productos.estaSemana') : new Date(`${semana.inicio}T12:00:00Z`).toLocaleDateString(localeActual, { day: 'numeric', month: 'short', timeZone: 'UTC' }),
       destacada: semana.enCurso,
     }));
     dibujarLineas({
-      series, marcas, limites: [], en, conPuntos: true,
+      series, marcas, limites: [], en, conPuntos: true, ultimoEnCurso: datos.semanas.some((semana) => semana.enCurso),
       desde: 0, hasta: Math.max(1, datos.semanas.length - 1),
       vacio: t('productos.semanasVacio'),
     });
@@ -1374,10 +1551,11 @@ function dibujarProductosEn(datos, en) {
       return { x: j, texto, destacada: esHoy };
     });
     dibujarLineas({
-      series, marcas, limites: [], en, conPuntos: !largo,
+      series, marcas, limites: [], en, conPuntos: !largo, ultimoEnCurso: true, // (hoy va a medias: su tramo, punteado)
       desde: 0, hasta: datos.dias.length - 1,
       vacio: t('productos.vacio'),
     });
+    if (en.nota && datos.acumulado) en.nota.textContent = `${t('productos.notaAcumulado')} ${en.nota.textContent}`;
   }
 }
 
@@ -1611,8 +1789,9 @@ function aplicarAparienciaAnimada(apariencia) {
   // basta con actualizar eso, sin repintar el resto.
   const antes = aparienciaMostrada;
   const coloresIguales = antes !== null && JSON.stringify(apariencia.colores || null) === JSON.stringify(antes.colores || null);
-  const soloTamano = antes !== null && coloresIguales && ['tema', 'opacidad', 'modo', 'orientacion', 'escala', 'todas', 'formatoReinicio', 'sinBarras', 'ocultarHoy']
-    .every((clave) => apariencia[clave] === antes[clave]);
+  const soloTamano = antes !== null && coloresIguales && ['tema', 'opacidad', 'modo', 'orientacion', 'escala', 'todas', 'formatoReinicio', 'sinBarras', 'ocultarHoy', 'panelTodas']
+    .every((clave) => apariencia[clave] === antes[clave])
+    && JSON.stringify(apariencia.pnlSeparadas || []) === JSON.stringify(antes.pnlSeparadas || []); // (las franjas del Panel en su ventana)
   // El formato del reinicio: se aplica al instante a todos los "Reinicio: ...".
   if (apariencia.formatoReinicio && apariencia.formatoReinicio !== formatoReinicio) {
     formatoReinicio = apariencia.formatoReinicio;
@@ -1647,11 +1826,12 @@ function aplicarAparienciaAnimada(apariencia) {
     ponerAltoDelPanel(apariencia.altoPanel);
   }
 
-  // Los botones de vista muestran cuál está activa.
-  document.getElementById('boton-compacto').setAttribute('aria-pressed', String(apariencia.modo === 'compacto'));
-  document.getElementById('boton-completo').setAttribute('aria-pressed', String(apariencia.modo === 'completo'));
-  for (const boton of document.querySelectorAll('[data-alternar="compacto"], [data-alternar="completo"], [data-alternar="tablero"]')) {
-    boton.setAttribute('aria-pressed', String(apariencia.modo === boton.dataset.alternar));
+  // Menos y más: en el tamaño más chico no hay "menos"; en el más grande no hay "más"
+  const TAMANOS = ['mini', 'compacto', 'normal', 'tablero'];
+  const posicion = TAMANOS.indexOf(apariencia.modo);
+  for (const boton of document.querySelectorAll('[data-tamano]')) {
+    const paso = Number(boton.dataset.tamano);
+    boton.disabled = posicion >= 0 && (paso < 0 ? posicion === 0 : posicion === TAMANOS.length - 1);
   }
 
   const cambiar = () => {
@@ -1698,26 +1878,66 @@ window.widget.alCambiarApariencia(aplicarAparienciaAnimada);
 window.widget.alCambiarAncla((anclaAbajo) => {
   if (panelActual === null && !esCompleto()) document.body.classList.toggle('abajo', !anclaAbajo);
 });
-// Los botones de vista: el de una barra pasa a la vista compacta, y el de cuatro cuadritos a la completa.
-// Pulsar el mismo botón otra vez vuelve a la vista normal.
-document.getElementById('boton-compacto').addEventListener('click', () => {
-  window.widget.alternarModo('compacto');
+// Las pastillas del Panel con varias cuentas: una por cuenta (elige cuál se ve) y "Todas" (una fila por cuenta)
+function dibujarPastillasDeCuentas(datos) {
+  const lista = document.getElementById('pastillas-lista');
+  const cuentas = datos.cuentas || [];
+  const todas = document.body.classList.contains('panel-todas');
+  const firma = cuentas.map((c) => `${c.id}:${c.nombre}`).join('|') + `|${datos.activa}|${todas}`;
+  if (lista.dataset.firma === firma) return;
+  lista.dataset.firma = firma;
+  const pastilla = (texto, activa, alPulsar) => {
+    const boton = crear('button', 'pastilla-cuenta', texto);
+    boton.type = 'button';
+    boton.setAttribute('role', 'tab');
+    boton.setAttribute('aria-selected', String(activa));
+    boton.addEventListener('click', alPulsar);
+    return boton;
+  };
+  lista.replaceChildren(
+    ...cuentas.map((c) => pastilla(c.nombre, !todas && c.id === datos.activa, () => {
+      window.widget.panelTodas(false);
+      window.widget.activarCuenta(c.id);
+    })),
+    pastilla(t('pastillas.todas'), todas, () => window.widget.panelTodas(true)),
+  );
+}
+
+// La mínima: con el mouse un momento sobre el círculo, se asoma la compacta
+{
+  const circulo = document.getElementById('mini');
+  let espera = null;
+  circulo.addEventListener('mouseenter', (evento) => {
+    if (!document.body.classList.contains('mini') || evento.buttons) return;
+    clearTimeout(espera);
+    espera = setTimeout(() => window.widget.asomar(), 450);
+  });
+  circulo.addEventListener('mouseleave', () => clearTimeout(espera));
+}
+
+// La compacta: cada número abre su panel (Hoy → historial, Sesión → proyección, Semana → desglose, límites por modelo → productos)
+document.getElementById('vista-datos').addEventListener('click', (evento) => {
+  if (!document.body.classList.contains('compacto') || evento.target.closest('button')) return;
+  const medidor = evento.target.closest('.medidor');
+  if (!medidor) return;
+  const todos = [...document.querySelectorAll('#vista-datos .medidor')];
+  const indice = todos.indexOf(medidor);
+  const panel = ['historial', 'proyeccion', 'desglose'][indice] || 'productos';
+  abrirPanel(panel);
 });
-document.getElementById('boton-completo').addEventListener('click', () => {
-  window.widget.alternarModo('completo');
-});
-// Los botones de la lista de cuentas (cuando se ven todas a la vez): hacen lo mismo que los de la tarjeta.
-// "Más" (⋯): muestra u oculta los íconos que no están siempre a la vista; pulsar cualquier otro ícono lo vuelve a cerrar
-const botonMas = document.getElementById('boton-mas');
-const cerrarMas = () => { document.body.classList.remove('mas-abierto'); botonMas.setAttribute('aria-pressed', 'false'); };
-botonMas.addEventListener('click', () => {
-  const abierto = document.body.classList.toggle('mas-abierto');
-  botonMas.setAttribute('aria-pressed', String(abierto));
-});
-document.querySelector('.herramientas').addEventListener('click', (evento) => {
-  const boton = evento.target.closest('.boton-icono');
-  if (boton && boton !== botonMas) cerrarMas();
-});
+
+// Las franjas del Panel: el botón ↗ la saca a su propia ventana; en esa ventana, la X la devuelve al Panel
+for (const boton of document.querySelectorAll('[data-separar]')) {
+  boton.addEventListener('click', () => window.widget.separarParte(boton.dataset.separar));
+}
+for (const boton of document.querySelectorAll('.pnl-juntar')) {
+  boton.addEventListener('click', () => window.widget.juntarParte());
+}
+
+// Menos y más información: pasan al tamaño anterior o al siguiente (la app decide cuál es)
+for (const boton of document.querySelectorAll('[data-tamano]')) {
+  boton.addEventListener('click', () => window.widget.cambiarTamano(Number(boton.dataset.tamano)));
+}
 
 for (const boton of document.querySelectorAll('[data-alternar]')) {
   boton.addEventListener('click', () => {

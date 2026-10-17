@@ -4,7 +4,7 @@
 
 [Versión en español](README.md)
 
-![Headroom with one account and the Claude Code context window](docs/captura-tarjeta.png)
+![Headroom with one account](docs/captura-tarjeta.png)
 
 > **Unofficial** project. Not affiliated with Anthropic. "Claude" is a trademark of Anthropic.
 >
@@ -21,102 +21,105 @@ It also helps you **spread your weekly quota over the days**: you choose how muc
 
 ## Examples
 
-The screenshots use **simulated data** (10 days of made-up usage) to show everything it can do. They show the app in Spanish; it's also available in English and three more languages.
+The screenshots use **simulated data** (10 days of made-up usage), to show everything it can do.
 
-### With a single account
+### The card
 
-**Everything at a glance.** The full view puts together the bars, the Claude Code context window, the history, the breakdown and the projection:
+**Today, the 5-hour session and the week**, each with its big number, its bar and how you're doing against yesterday, the previous session or last week at this same point (in points: ▲ +8 pts = 8 points more). The tabs at the bottom open each panel; at the top right, the layout, less or more information (− +) and Settings.
 
-![Full view with one account](docs/captura-completo-una.png)
-
-**Dashboard.** Everything at once: the full view plus the charts in three groups (Today; Week and month; Habits), each with its own number: hour by hour, by product, busiest hours, last 30 days, week by week, by day of the week and the day-and-hour map. It adapts to whatever size you give it:
-
-![Dashboard with one account](docs/captura-panel.png)
+![The card with one account](docs/captura-tarjeta.png)
 
 **History as line charts.** Today hour by hour, and the last 7 or 30 days, with your limit marked:
 
-![History for today and for 7 days](docs/captura-historial.png)
+![7-day history](docs/captura-historial.png)
 
-**What time of day you use it most.** The average of each hour of the day, with your peak hour. And next to the week, how you're doing against **last week at this same point** (▼ 12% = you're 12% below). Panels grow when you drag their edges:
+**When you use it most.** The average for each hour of the day, with your peak hour. Panels grow by dragging their edges:
 
 ![Busiest hours, with the panel enlarged](docs/captura-horas.png)
 
-**Usage by product over time.** How much Claude Code, Chats, Cowork and Others used: today, this week (from the day your plan resets), 30 days or week by week:
+**Usage by product over time.** How much Claude Code, Chats, Cowork and Other used: the last 24 hours, this week (running total since your week started), 30 days or week by week. The last stretch is dashed, because today or the current week isn't over yet:
 
 | This week | Week by week |
 | --- | --- |
-| ![Usage by product this week](docs/captura-productos.png) | ![Usage by product by weeks](docs/captura-semanas.png) |
+| ![Usage by product this week](docs/captura-productos.png) | ![Usage by product by week](docs/captura-semanas.png) |
 
-**Numbers only.** If you don't want the bars, hide them and the card gets shorter, with the little marks that compare against yesterday, the previous session and last week (▲ more, ▼ less):
+**Numbers only.** If you don't want the bars, hide them and the card gets shorter:
 
 ![The card without bars](docs/captura-numeros.png)
 
-**Whatever size you want.** Minimal (a circle), compact (one line) or horizontal:
+### Any size you like
 
-![Minimal, compact and horizontal views](docs/captura-vistas.png)
+The **−** and **+** buttons move from one view to the next, from less to more information: **Minimal → Compact → Normal → Dashboard**.
 
-**Each part in its own window.** Move the history, breakdown, projection, usage by product or context window out and place them wherever you like; windows never cover each other:
+| Minimal | Compact |
+| --- | --- |
+| ![Minimal view: a circle](docs/captura-mini.png) | ![Compact view: one line](docs/captura-compacta.png) |
 
-![The widget with the history and usage by product in their own windows](docs/captura-partes.png)
+**Minimal** is a circle with two rings (the week outside, the 5-hour session inside). Hover over it and the compact view peeks out. In **compact**, clicking each number opens its panel.
+
+**Normal** can be vertical (the card above) or **horizontal**:
+
+![Horizontal normal view](docs/captura-horizontal.png)
+
+### The dashboard
+
+**Everything at once, organized by questions:** How am I doing right now? (pace, what's left today, today's sessions, when you started), How is the week going? (against last week day by day, where you'd end up, by product), When and how do I use Claude? (day-and-hour map, by weekday, your typical day, streaks) and How is my year going?
+
+![The dashboard with one account](docs/captura-panel.png)
+
+**Each dashboard question in its own window.** The button next to its title pops it out into a floating window; its X sends it back:
+
+![A dashboard section in its own window](docs/captura-panel-ventana.png)
+
+The same goes for the history, breakdown, projection, usage by product and the Claude Code context window: each can be popped out and placed wherever you like. Windows never cover each other.
 
 ### With several accounts
 
-**All at once**, each with its plan and its bars (plus Fable and extra usage, if it has them):
+**All at once**, each with its plan and bars (plus Fable and extra usage, if it has them). You can have **as many accounts as you want**:
 
-| Several accounts at once | Accounts panel |
-| --- | --- |
-| ![Two stacked accounts](docs/captura-normal.png) | ![Accounts panel](docs/captura-cuentas.png) |
+![Two accounts on the card](docs/captura-normal.png)
 
-![Accounts view: one row per account](docs/captura-lista.png)
+**On the dashboard**, pills at the top choose which account to see, or **All** to see them together. **Fable** is shown as big as the other bars, with its own comparison against last week:
 
-**The full view compares the accounts**: one line per account in the history, one bar per account in the breakdown, and each one's projection:
+![The dashboard with two accounts](docs/captura-panel-varias.png)
 
-![Full view with two accounts](docs/captura-completo.png)
-
-**And the dashboard**, with one line per account in every chart:
-
-![Dashboard with two accounts](docs/captura-panel-varias.png)
-
-**Or each account in its own window**, to move each one separately:
-
-![Two accounts, each in its own window](docs/captura-ventanas.png)
+**Or each account in its own window** (in Settings), to move each one separately.
 
 ## Features
 
 ### What it shows
-- **Today:** what you've used today against a **daily limit you set** (it can be different for each weekday), or an **automatic limit** that spreads what's left of your week over the remaining days.
+- **Today:** what you've used today against a **daily limit you set** (it can be different for each weekday), or an **automatic limit** that spreads what's left of your week over the remaining days. If you only care about the session and the week, **Today can be hidden**.
 - **5-hour session** and **weekly quota**, with their percentage and **how long until they reset** ("in 2 h 15 min"), or the exact time if you prefer.
-- **Max plan:** also the weekly **Fable** window (and any other per-model limit claude.ai reports). It does not appear on Pro.
-- **Extra usage:** if you have extra credit enabled with a monthly cap, what you've spent (for example $16 / $50).
+- **Max plan:** also the weekly **Fable** window (and any other per-model limits claude.ai reports), on the same level as the other bars. It doesn't appear on Pro.
+- **Extra usage:** if you have extra credit turned on with a monthly cap, how much you've spent (for example US$16 / US$50).
 - **Plan type** of each account (Pro, Max 5x, Team…).
+- **Comparisons, always in points:** Today against yesterday at this time, the session against the previous one, and the week and Fable against last week at this same point.
 - **History** as line charts: **today** hour by hour, and the last **7 or 30 days**, with your limit marked and your daily average.
-- **Busiest hours:** what time of day most of your quota goes (the average of each hour), with your peak hour.
-- **Comparison with last week:** next to the weekly bar, how many points above or below last week you are at this same point. The same for **Today** (against yesterday at this time) and for the **5-hour session** (against the previous session).
-- Weekly **breakdown** by product (Claude Code, Chats, Cowork…) and **usage by product over time**: today, this week (from the day your plan resets), 30 days or week by week. On plans with a per-model limit (**Fable**), that limit shows up as one more dashed line.
-- **Projection** for today, the 5-hour session and the week ("at this pace you'd hit the limit at 6:40 pm", "you'd use up the session around 4:20 pm"). The session one also shows when you hover its bar.
-- **Statistics** on the dashboard, from what is already stored: your highest day, your average, your streak under the limit, which weekdays and hours you use most (a day-by-hour map), how much you have left each week, a suggested daily limit and how many 5-hour sessions you exhaust. It keeps up to a year of history and, from Settings, saves a **report** to print or save as PDF.
-- With several accounts, the history, breakdown and projection show every account at once.
-- **Hover over a bar** to see what it shows.
+- **Busiest hours:** which hours of the day use the most quota (the average for each hour), with your peak hour.
+- **Breakdown** of the week by product (Claude Code, Chats, Cowork…) and **usage by product over time**: last 24 hours, this week, 30 days or week by week. On plans with a per-model limit (**Fable**), that limit shows up as one more line.
+- **Projection** for today, the 5-hour session and the week ("at this pace you'd hit your limit at 18:40", "you'd run out of the session around 16:20"). The session one also shows up when you hover over its bar.
+- **The dashboard**, with what's already saved: your current pace, what's left today, your highest day, your streak under the limit, which days and hours you use most, how much you have left over each week, a suggested daily limit, how many 5-hour sessions you run out of and how your year is going. It keeps up to a year of history and, from Settings, makes a **report** to print or save as PDF.
+- **Hovering over a bar** explains what it shows.
 - **Numbers only** (optional): hides the bars and leaves just the data.
-- **Claude Code context window:** how much of its context window each Claude Code chat you used in the last 3 hours (up to 5) has used, so you know when to compact it. See [below](#claude-code-context-window) for when it works.
-- **Tray icon** next to the clock that turns green, yellow or red with today's usage.
+- **Claude Code context window:** how much of its context window each Claude Code chat you used in the last 3 hours (up to 5) has filled, so you know when to compact it. See [below](#claude-code-context-window) for when it works.
+- **Icon next to the clock** that turns green, yellow or red based on today's usage.
 
 ### Alerts (Windows notifications)
-- When you approach and reach your **daily limit**.
-- 5-hour session: at the percentage you choose, when it runs out, when it resets and when **at this pace you'd run out** before the reset.
-- High **weekly quota** (85% by default), once per week, and when **at this pace you'd use up the week** before the reset.
-- **Compact a Claude Code chat** when it reaches the percentage you choose (70% by default), and again every 10% more.
-- **Summary** of your day yesterday (when the day starts) and of your week (when it resets).
-- **Do not disturb:** mute alerts for 1 hour or until tomorrow from the tray menu.
-- **One-click update** when a new version is out: it downloads, installs and reopens by itself.
+- When you get close to and reach your **daily limit**.
+- 5-hour session: when it reaches the percentage you choose, when it runs out, when it resets, and when **at this pace you'd run out of session** before the reset.
+- High **weekly quota** (85% by default), once a week, and when **at this pace you'd use up the week** before the reset.
+- **Compact a Claude Code chat** when it reaches the percentage you choose (70% by default), and again every further 10%. If several chats get there at once, you get **a single alert** listing them all.
+- **Summary** of yesterday (when the day starts) and of your week (when it resets).
+- **Do not disturb:** silences alerts for 1 hour or until tomorrow from the tray menu.
+- **One-click update** when there's a new version: it downloads, installs and reopens itself.
 
 ### Views and look
-- Views go from least to most information: **Minimal** (two rings: the week outside, the 5-hour session inside), **Compact** (one line with the three numbers and their thin bars), **Normal** (the card, vertical or horizontal: the big number first; panels open from the ⋯ button), **Full** (the numbers on top; the history large on the left; breakdown and projection on the right) and **Dashboard** (everything, with the charts in groups: hour by hour, by product, busiest hours, 30 days, week by week, by day of the week and the day-and-hour map).
-- **Accounts:** all your accounts in a list, one row per account.
+- **Four sizes**, from less to more information, with the − and + buttons: **Minimal** (a circle), **Compact** (one line with the three numbers and their small bars), **Normal** (the card, vertical or horizontal, with tabs for each panel) and **Dashboard** (everything, organized by questions).
+- **As many accounts as you want.** With several, the card shows them together and the dashboard has pills to pick one or see them all.
 - **Each account in its own window** (optional): each one moves separately and has its own view.
-- **Parts in their own window:** the history, breakdown, projection, usage by product and context window can be moved out of the widget (button next to the X) and placed wherever you like. With several accounts, each one says which account it belongs to.
-- **Windows never overlap:** drop one on top of another and it moves aside and snaps to the edges. Only Settings may cover others while it's open.
-- **Resizable windows and panels:** drag the edges of the widget, of an open panel or of a detached part to change its size; text size stays the same and each one remembers its own (double-click an edge to go back to the original size).
+- **Parts in their own window:** the history, breakdown, projection, usage by product, context window and each dashboard question can be popped out into a floating window and placed wherever you like. With several accounts, each says which account it belongs to.
+- **Windows don't cover each other:** if you drop one on top of another, it moves beside it and snaps to the edges. Only Settings can stay on top while it's open.
+- **Resizable windows and panels:** drag the edges of the widget, an open panel or a popped-out part to resize it; text doesn't change size and each one remembers its own size (double-click an edge to go back to the original size).
 - Light, dark or automatic theme, transparency, scale from 70% to 160% and **custom colors** (accent and bar colors).
 - **Keyboard shortcut** Ctrl + Alt + C to show or hide it from any program.
 - **Show only while Claude is open** (optional): the widget appears when you open the Claude app or Claude Code on that computer, and hides when you close it.

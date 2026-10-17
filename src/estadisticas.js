@@ -4,7 +4,7 @@
 //
 // Este archivo no usa Electron ni lee archivos: recibe datos y devuelve resultados (así se puede probar).
 
-const { ultimosDias } = require('./calculo');
+const { ultimosDias, diaLocal } = require('./calculo');
 
 const redondear = (valor) => Math.round(valor * 10) / 10;
 const promedio = (lista) => (lista.length ? lista.reduce((suma, v) => suma + v, 0) / lista.length : null);
@@ -112,4 +112,124 @@ function calcular({ historial = [], semanasPasadas = [], sesiones = [], limiteDi
   };
 }
 
-module.exports = { calcular };
+// ----- El Panel: lo que responde a "¿cómo voy ahora?", "¿cómo va la semana?", "¿cuándo y cómo uso Claude?" y "¿cómo voy en el año?" -----
+// Todo sale de lo guardado por cuenta. Cada cosa es null (o vacía) mientras no haya datos para decirla.
+const HORA_MS = 60 * 60 * 1000;
+const DIA_MS = 24 * HORA_MS;
+const horaTexto = (ms) => { const d = new Date(ms); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+
+// ¿Cómo voy ahora? Con las lecturas de hoy: el ritmo de la última hora, cuánto queda para el límite y a qué hora llegarías,
+// las sesiones de hoy y la hora de arranque (de hoy, y la habitual según el historial).
+function ahoraMismo({ lecturasDeHoy, hoy, limite, sesiones = [], sesion5h = null, historial = [], ahora = new Date() }) {
+  const puntos = (lecturasDeHoy && lecturasDeHoy.puntos ? lecturasDeHoy.puntos : []).filter((p) => Number.isFinite(p.t) && Number.isFinite(p.hoy));
+  const ultimo = puntos[puntos.length - 1] || null;
+  // Ritmo de la última hora: lo que subió "hoy" entre la lectura de hace una hora (o la más cercana) y la última
+  let ritmo = null;
+  if (ultimo) {
+    const haceUnaHora = ultimo.t - HORA_MS;
+    const antes = [...puntos].reverse().find((p) => p.t <= haceUnaHora) || puntos[0];
+    const horas = (ultimo.t - antes.t) / HORA_MS;
+    if (horas >= 1 / 3) ritmo = redondear(Math.max(0, ultimo.hoy - antes.hoy) / horas);
+  }
+  // Ritmo medio de hoy: lo usado desde la primera lectura con uso
+  let ritmoMedio = null;
+  const primeroConUso = puntos.find((p) => p.hoy > 0);
+  if (primeroConUso && ultimo) {
+    const horas = (ultimo.t - primeroConUso.t) / HORA_MS;
+    if (horas >= 0.5) ritmoMedio = redondear(ultimo.hoy / horas);
+  }
+  const quedaHoy = Number.isFinite(hoy) && Number.isFinite(limite) ? Math.max(0, redondear(limite - hoy)) : null;
+  const horasParaLimite = quedaHoy !== null && ritmo > 0 ? redondear(quedaHoy / ritmo) : null;
+  // Sesiones de hoy: las terminadas hoy más la que está en curso
+  const inicioDelDia = new Date(ahora); inicioDelDia.setHours(0, 0, 0, 0);
+  const deHoy = sesiones.filter((se) => se && se.finMs >= inicioDelDia.getTime() && se.inicioMs <= ahora.getTime());
+  const sesionesHoy = { total: deHoy.length + (sesion5h ? 1 : 0), agotadas: deHoy.filter((se) => Number.isFinite(se.llenaMs)).length + (sesion5h && sesion5h.porcentaje >= 100 ? 1 : 0) };
+  // Arranque: la primera lectura de hoy con uso; la habitual, la primera hora con uso de cada día del historial (promedio)
+  const arranqueHoy = primeroConUso ? horaTexto(primeroConUso.t) : null;
+  const primerasHoras = historial.filter((d) => Array.isArray(d.horas)).map((d) => d.horas.findIndex((v) => v > 0)).filter((h) => h >= 0);
+  const arranqueHabitual = primerasHoras.length >= 3 ? `${String(Math.round(promedio(primerasHoras))).padStart(2, '0')}:00` : null;
+  return { ritmo, ritmoMedio, quedaHoy, horasParaLimite, sesionesHoy, arranqueHoy, arranqueHabitual };
+}
+
+// ¿Cómo va la semana? La curva de esta semana contra la de la pasada (en horas desde que empezó), lo mismo para cada
+// modelo (Fable...), y qué producto crece o baja respecto de la semana pasada (por su parte del total).
+function semanaContraPasada({ semanaEnCurso, curvaSemanaPasada, curvasDeModelos, semanasPasadas = [] }) {
+  const reinicioMs = semanaEnCurso ? semanaEnCurso.reinicioMs : null;
+  const esLaAnterior = (pasada) => pasada && Number.isFinite(reinicioMs) && Math.abs(pasada.reinicioMs - (reinicioMs - 7 * DIA_MS)) < 12 * HORA_MS;
+  const curvaEsta = semanaEnCurso && Array.isArray(semanaEnCurso.curva) ? semanaEnCurso.curva : [];
+  const curvaPasada = esLaAnterior(curvaSemanaPasada) ? curvaSemanaPasada.puntos : null;
+  const modelos = {};
+  for (const [nombre, curva] of Object.entries(curvasDeModelos || {})) {
+    const sirve = curva.pasada && Math.abs(curva.pasada.reinicioMs - (curva.reinicioMs - 7 * DIA_MS)) < 12 * HORA_MS;
+    modelos[nombre] = { curvaEsta: curva.puntos || [], curvaPasada: sirve ? curva.pasada.puntos : null };
+  }
+  // Productos: la parte de cada uno en el total de la semana, contra la parte que tuvo la semana pasada
+  const actual = semanaEnCurso && semanaEnCurso.productos ? semanaEnCurso.productos : {};
+  const anterior = semanasPasadas.length ? semanasPasadas[semanasPasadas.length - 1].productos || {} : {};
+  const parte = (productos, clave) => { const total = Object.values(productos).reduce((a, b) => a + (b || 0), 0); return total > 0 ? ((productos[clave] || 0) / total) * 100 : null; };
+  const productos = Object.keys(actual).map((clave) => {
+    const ahora = parte(actual, clave);
+    const antes = parte(anterior, clave);
+    const cambio = ahora !== null && antes !== null && antes > 0 ? Math.round(((ahora - antes) / antes) * 100) : null;
+    return { clave, valor: actual[clave] || 0, parte: ahora === null ? null : redondear(ahora), cambio };
+  }).sort((a, b) => b.valor - a.valor);
+  return { curvaEsta, curvaPasada, modelos, productos };
+}
+
+// ¿Cuándo y cómo uso Claude? El reparto mañana / tarde / noche, los días sin uso del mes y la mejor racha bajo el límite.
+function habitos({ historial = [], limiteDiario = 14, ahora = new Date() }) {
+  const limiteDe = (d) => (Number.isFinite(d.limite) ? d.limite : limiteDiario);
+  const porDia = new Map(historial.filter((d) => d && Number.isFinite(d.uso)).map((d) => [d.dia, d]));
+  const dias30 = ultimosDias(ahora, 30);
+  const conHoras = dias30.map((dia) => porDia.get(dia)).filter((d) => d && Array.isArray(d.horas) && d.horas.length === 24);
+  let diaTipo = null;
+  if (conHoras.length) {
+    const suma = [0, 0, 0]; // mañana (6–12), tarde (12–19), noche (19–6)
+    for (const d of conHoras) d.horas.forEach((v, h) => { suma[h >= 6 && h < 12 ? 0 : h >= 12 && h < 19 ? 1 : 2] += Number(v) || 0; });
+    const total = suma[0] + suma[1] + suma[2];
+    if (total > 0) diaTipo = { manana: Math.round((suma[0] / total) * 100), tarde: Math.round((suma[1] / total) * 100), noche: Math.round((suma[2] / total) * 100) };
+  }
+  const diasSinUso = dias30.filter((dia) => { const d = porDia.get(dia); return !d || d.uso < 0.5; }).length;
+  // Mejor racha: la tira más larga de días seguidos (de los guardados) bajo el límite
+  let mejorRacha = 0;
+  let racha = 0;
+  for (const dia of [...porDia.keys()].sort()) {
+    const d = porDia.get(dia);
+    if (d.uso >= limiteDe(d)) racha = 0;
+    else { racha += 1; mejorRacha = Math.max(mejorRacha, racha); }
+  }
+  return { diaTipo, diasSinUso, mejorRacha };
+}
+
+// ¿Cómo voy en el año? Las últimas semanas (cómo terminó cada una, y lo que lleva la actual), lo mismo para cada modelo,
+// las sesiones agotadas por semana, y los récords.
+function anio({ semanasPasadas = [], semanaEnCurso = null, inicioSemanaMs = null, sesiones = [], cuantas = 12 }) {
+  const terminadas = semanasPasadas.filter((se) => se && Number.isFinite(se.semana));
+  const lista = terminadas.slice(-(cuantas - 1)).map((se) => ({ inicio: se.inicio, semana: redondear(se.semana), modelos: se.modelos || null, enCurso: false }));
+  if (semanaEnCurso && Number.isFinite(inicioSemanaMs)) {
+    lista.push({ inicio: diaLocal(new Date(inicioSemanaMs)), semana: redondear(semanaEnCurso.semana), modelos: semanaEnCurso.modelos || null, enCurso: true });
+  }
+  // Sesiones por semana: las que terminaron dentro de cada semana (desde su inicio, 7 días)
+  const sesionesPorSemana = lista.map((se) => {
+    const desde = new Date(`${se.inicio}T00:00:00`).getTime();
+    const dentro = sesiones.filter((x) => x && x.finMs >= desde && x.finMs < desde + 7 * DIA_MS);
+    return { inicio: se.inicio, total: dentro.length, agotadas: dentro.filter((x) => Number.isFinite(x.llenaMs)).length };
+  });
+  const nombresDeModelos = [...new Set(lista.flatMap((se) => Object.keys(se.modelos || {})))];
+  const modelos = Object.fromEntries(nombresDeModelos.map((nombre) => [nombre, lista.map((se) => (se.modelos && Number.isFinite(se.modelos[nombre]) ? redondear(se.modelos[nombre]) : null))]));
+  const mayor = (xs) => xs.reduce((m, x) => (!m || x.semana > m.semana ? x : m), null);
+  const menor = (xs) => xs.reduce((m, x) => (!m || x.semana < m.semana ? x : m), null);
+  const records = terminadas.length ? {
+    semanaMax: (({ inicio, semana }) => ({ inicio, valor: redondear(semana) }))(mayor(terminadas)),
+    semanaMin: (({ inicio, semana }) => ({ inicio, valor: redondear(semana) }))(menor(terminadas)),
+    pctAgotadas: Math.round((terminadas.filter((se) => se.semana >= 100).length / terminadas.length) * 100),
+    modelos: Object.fromEntries(nombresDeModelos.map((nombre) => {
+      const con = terminadas.filter((se) => se.modelos && Number.isFinite(se.modelos[nombre]));
+      const top = con.reduce((m, se) => (!m || se.modelos[nombre] > m.modelos[nombre] ? se : m), null);
+      return [nombre, top ? { inicio: top.inicio, valor: redondear(top.modelos[nombre]) } : null];
+    })),
+  } : null;
+  return { semanas: lista, sesionesPorSemana, modelos, records, promedio: terminadas.length ? redondear(promedio(terminadas.map((se) => se.semana))) : null };
+}
+
+module.exports = { calcular, ahoraMismo, semanaContraPasada, habitos, anio };

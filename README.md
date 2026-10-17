@@ -4,7 +4,7 @@
 
 [English version](README.en.md)
 
-![Headroom con una cuenta y la ventana de contexto de Claude Code](docs/captura-tarjeta.png)
+![Headroom con una cuenta](docs/captura-tarjeta.png)
 
 > Proyecto **no oficial**. No tiene relación con Anthropic. "Claude" es una marca de Anthropic.
 >
@@ -23,79 +23,82 @@ Además te ayuda a **repartir tu cuota semanal en el día a día**: tú eliges c
 
 Las capturas usan **datos simulados** (10 días de uso inventado), para mostrar todo lo que se puede hacer.
 
-### Con una sola cuenta
+### La tarjeta
 
-**Todo de un vistazo.** La vista completa junta las barras, la ventana de contexto de Claude Code, el historial, el desglose y la proyección:
+**Hoy, la sesión de 5 horas y la semana**, cada una con su número grande, su barra y cómo vas contra ayer, contra la sesión anterior o contra la semana pasada a esta misma altura (en puntos: ▲ +8 pts = 8 puntos más). Abajo, las pestañas abren cada panel; arriba a la derecha, la disposición, menos o más información (− +) y Ajustes.
 
-![Vista completa con una cuenta](docs/captura-completo-una.png)
-
-**Panel de control.** Todo a la vez: lo de la vista completa y, debajo, los gráficos en tres grupos (Hoy; Semana y mes; Hábitos), cada uno con su número: hora a hora, por producto, horas de más uso, últimos 30 días, semana a semana, por día de la semana y el mapa de día y hora. Se adapta al tamaño que le des:
-
-![Panel de control con una cuenta](docs/captura-panel.png)
+![La tarjeta con una cuenta](docs/captura-tarjeta.png)
 
 **Historial en gráficos de línea.** Hoy hora a hora, y los últimos 7 o 30 días, con tu límite marcado:
 
-![Historial de hoy y de 7 días](docs/captura-historial.png)
+![Historial de 7 días](docs/captura-historial.png)
 
-**A qué horas usas más.** El promedio de cada hora del día, con tu hora pico. Y junto a la semana, cómo vas contra la **semana pasada a esta misma altura** (▼ 12% = vas un 12% por debajo). Los paneles se agrandan arrastrando sus bordes:
+**A qué horas usas más.** El promedio de cada hora del día, con tu hora pico. Los paneles se agrandan arrastrando sus bordes:
 
 ![Horas de más uso, con el panel agrandado](docs/captura-horas.png)
 
-**Uso por producto a lo largo del tiempo.** Cuánto usaron Claude Code, Chats, Cowork y Otros: hoy, esta semana (desde el día en que se reinicia tu plan), 30 días o semana a semana:
+**Uso por producto a lo largo del tiempo.** Cuánto usaron Claude Code, Chats, Cowork y Otros: las últimas 24 horas, esta semana (acumulado desde que empezó tu semana), 30 días o semana a semana. El último tramo va punteado, porque hoy o la semana en curso todavía no terminan:
 
 | Esta semana | Semana a semana |
 | --- | --- |
 | ![Uso por producto esta semana](docs/captura-productos.png) | ![Uso por producto por semanas](docs/captura-semanas.png) |
 
-**Solo números.** Si no quieres las barras, se ocultan y la tarjeta queda más baja, con las marquitas que comparan con ayer, con la sesión anterior y con la semana pasada (▲ más, ▼ menos):
+**Solo números.** Si no quieres las barras, se ocultan y la tarjeta queda más baja:
 
 ![La tarjeta sin barras](docs/captura-numeros.png)
 
-**Del tamaño que quieras.** Mínimo (un círculo), compacto (una línea) u horizontal:
+### Del tamaño que quieras
 
-![Vistas mínima, compacta y horizontal](docs/captura-vistas.png)
+Con **−** y **+** pasas de una vista a otra, de menos a más información: **Mínima → Compacta → Normal → Panel**.
 
-**Cada parte en su propia ventana.** Saca el historial, el desglose, la proyección, el uso por producto o la ventana de contexto y ponlos donde quieras; las ventanas nunca se tapan entre sí:
+| Mínima | Compacta |
+| --- | --- |
+| ![Vista mínima: un círculo](docs/captura-mini.png) | ![Vista compacta: una línea](docs/captura-compacta.png) |
 
-![El widget con el historial y el uso por producto en ventanas propias](docs/captura-partes.png)
+La **mínima** es un círculo con dos anillos (afuera la semana, adentro la sesión de 5 horas). Al dejar el mouse encima se asoma la compacta. En la **compacta**, cada número abre su panel con un clic.
+
+La **normal** puede ser vertical (la tarjeta de arriba) u **horizontal**:
+
+![Vista normal horizontal](docs/captura-horizontal.png)
+
+### El Panel
+
+**Todo a la vez, ordenado por preguntas:** ¿Cómo voy ahora? (ritmo, cuánto te queda hoy, sesiones del día, a qué hora empezaste), ¿Cómo va la semana? (contra la pasada día a día, cómo terminarías, por producto), ¿Cuándo y cómo uso Claude? (mapa de día y hora, por día de la semana, tu día tipo, rachas) y ¿Cómo voy en el año?
+
+![El Panel con una cuenta](docs/captura-panel.png)
+
+**Cada pregunta del Panel en su propia ventana.** El botón junto a su título la saca a una ventana flotante; con su X vuelve al Panel:
+
+![Una franja del Panel en su propia ventana](docs/captura-panel-ventana.png)
+
+Lo mismo con el historial, el desglose, la proyección, el uso por producto y la ventana de contexto de Claude Code: cada uno se puede sacar a su ventana y poner donde quieras. Las ventanas nunca se tapan entre sí.
 
 ### Con varias cuentas
 
-**Todas a la vez**, cada una con su plan y sus barras (y las de Fable y uso extra, si las tiene):
+**Todas a la vez**, cada una con su plan y sus barras (y las de Fable y uso extra, si las tiene). Puedes tener **todas las cuentas que quieras**:
 
-| Varias cuentas a la vez | Panel de cuentas |
-| --- | --- |
-| ![Dos cuentas apiladas](docs/captura-normal.png) | ![Panel de cuentas](docs/captura-cuentas.png) |
+![Dos cuentas en la tarjeta](docs/captura-normal.png)
 
-![Vista "Cuentas": una fila por cuenta](docs/captura-lista.png)
+**En el Panel**, unas pastillas arriba eligen qué cuenta ver, o **Todas** para verlas juntas. **Fable** sale igual de grande que las demás barras, con su propia comparación contra la semana pasada:
 
-**La vista completa compara las cuentas**: una línea por cuenta en el historial, una barra por cuenta en el desglose y la proyección de cada una:
+![El Panel con dos cuentas](docs/captura-panel-varias.png)
 
-![Vista completa con dos cuentas](docs/captura-completo.png)
-
-**Y el panel de control**, con una línea por cuenta en cada gráfico:
-
-![Panel de control con dos cuentas](docs/captura-panel-varias.png)
-
-**O cada cuenta en su propia ventana**, para mover cada una por separado:
-
-![Dos cuentas, cada una en su ventana](docs/captura-ventanas.png)
+**O cada cuenta en su propia ventana** (en Ajustes), para mover cada una por separado.
 
 ## Funciones
 
 ### Lo que muestra
-- **Hoy:** lo que llevas del día contra un **límite diario que pones tú** (puede ser distinto para cada día de la semana), o un **límite automático** que reparte lo que te queda de la semana entre los días que faltan.
+- **Hoy:** lo que llevas del día contra un **límite diario que pones tú** (puede ser distinto para cada día de la semana), o un **límite automático** que reparte lo que te queda de la semana entre los días que faltan. Si solo te interesan la sesión y la semana, **Hoy se puede ocultar**.
 - **Sesión de 5 horas** y **cuota semanal**, con su porcentaje y **cuánto falta para que se reinicien** ("en 2 h 15 min"), o la hora exacta si lo prefieres.
-- **Plan Max:** además, la ventana semanal de **Fable** (y otros límites por modelo que informe claude.ai). En Pro no aparece.
+- **Plan Max:** además, la ventana semanal de **Fable** (y otros límites por modelo que informe claude.ai), al mismo nivel que las otras barras. En Pro no aparece.
 - **Uso extra:** si tienes crédito extra activado con tope mensual, lo gastado (por ejemplo US$16 / US$50).
 - **Tipo de plan** de cada cuenta (Pro, Max 5x, Team…).
+- **Comparaciones, siempre en puntos:** Hoy contra ayer a esta hora, la sesión contra la anterior, y la semana y Fable contra la semana pasada a esta misma altura.
 - **Historial** en gráficos de línea: **hoy** hora a hora, y los últimos **7 o 30 días**, con tu límite marcado y tu promedio diario.
 - **Horas de más uso:** a qué horas del día se te va más cuota (el promedio de cada hora), con tu hora pico.
-- **Comparación con la semana pasada:** junto a la barra de la semana, cuántos puntos llevas de más o de menos que la semana pasada a esta misma altura. Lo mismo para **Hoy** (contra ayer a esta hora) y para la **sesión de 5 horas** (contra la sesión anterior).
-- **Desglose** de la semana por producto (Claude Code, Chats, Cowork…) y **uso por producto a lo largo del tiempo**: hoy, esta semana (desde el día en que se reinicia tu plan), 30 días o semana a semana. En los planes con límite por modelo (**Fable**), ese límite sale como una línea punteada más.
+- **Desglose** de la semana por producto (Claude Code, Chats, Cowork…) y **uso por producto a lo largo del tiempo**: últimas 24 horas, esta semana, 30 días o semana a semana. En los planes con límite por modelo (**Fable**), ese límite sale como una línea más.
 - **Proyección** de hoy, de la sesión de 5 horas y de la semana ("a este ritmo llegarías al límite a las 18:40", "agotarías la sesión hacia las 16:20"). La de la sesión también sale al pasar el mouse por su barra.
-- **Estadísticas** en el panel de control, con lo que ya está guardado: tu día más alto, tu promedio, tu racha bajo el límite, qué días de la semana y a qué horas usas más (un mapa de día por hora), cuánto te sobra cada semana, un límite diario sugerido y cuántas sesiones de 5 horas agotas. Guarda hasta un año de historial y, desde Ajustes, saca un **informe** para imprimir o guardar como PDF.
-- Con varias cuentas, el historial, el desglose y la proyección muestran todas las cuentas a la vez.
+- **El Panel**, con lo que ya está guardado: tu ritmo actual, cuánto te queda hoy, tu día más alto, tu racha bajo el límite, qué días y a qué horas usas más, cuánto te sobra cada semana, un límite diario sugerido, cuántas sesiones de 5 horas agotas y cómo va tu año. Guarda hasta un año de historial y, desde Ajustes, saca un **informe** para imprimir o guardar como PDF.
 - **Al dejar el mouse sobre una barra** se explica qué muestra.
 - **Solo números** (opcional): oculta las barras y deja solo los datos.
 - **Ventana de contexto de Claude Code:** cuánto de su ventana de contexto lleva cada chat de Claude Code que usaste en las últimas 3 horas (hasta 5), para saber cuándo conviene compactarlo. Ver [más abajo](#ventana-de-contexto-de-claude-code) cuándo funciona.
@@ -105,16 +108,16 @@ Las capturas usan **datos simulados** (10 días de uso inventado), para mostrar 
 - Al acercarte y al llegar a tu **límite diario**.
 - Sesión de 5 horas: al llegar al porcentaje que elijas, al agotarse, cuando se reinicia y cuando **a este ritmo te quedarías sin sesión** antes del reinicio.
 - **Cuota semanal** alta (85% por defecto), una vez por semana, y cuando **a este ritmo agotarías la semana** antes del reinicio.
-- **Compactar un chat de Claude Code** cuando llega al porcentaje que elijas (70% por defecto), y de nuevo cada 10% más.
+- **Compactar un chat de Claude Code** cuando llega al porcentaje que elijas (70% por defecto), y de nuevo cada 10% más. Si son varios chats a la vez, llega **un solo aviso** con todos.
 - **Resumen** de tu día de ayer (al empezar el día) y de tu semana (cuando se reinicia).
 - **No molestar:** silencia los avisos por 1 hora o hasta mañana desde el menú de la bandeja.
 - **Actualizar con un clic** cuando hay una versión nueva: se descarga, se instala y vuelve a abrirse sola.
 
 ### Vistas y aspecto
-- Las vistas van de menos a más información: **Mínima** (dos anillos: afuera la semana, adentro la sesión de 5 horas), **Compacta** (una línea con los tres números y sus barritas), **Normal** (la tarjeta, vertical u horizontal: el número grande primero; los paneles se abren desde el botón ⋯), **Completa** (los números arriba; el historial grande a la izquierda; desglose y proyección a la derecha) y **Panel de control** (todo, con los gráficos por grupos: hora a hora, por producto, horas de más uso, 30 días, semana a semana, por día de la semana y el mapa de día y hora).
-- **Cuentas:** todas tus cuentas en una lista, una fila por cuenta.
+- **Cuatro tamaños**, de menos a más información, con los botones − y +: **Mínima** (un círculo), **Compacta** (una línea con los tres números y sus barritas), **Normal** (la tarjeta, vertical u horizontal, con pestañas para cada panel) y **Panel** (todo, ordenado por preguntas).
+- **Todas las cuentas que quieras.** Con varias, la tarjeta las muestra juntas y el Panel tiene pastillas para elegir una o ver todas.
 - **Cada cuenta en su propia ventana** (opcional): cada una se mueve por separado y tiene su propia vista.
-- **Partes en su propia ventana:** el historial, el desglose, la proyección, el uso por producto y la ventana de contexto se pueden sacar del widget (botón junto a la X) y poner donde quieras. Con varias cuentas, cada una dice de qué cuenta es.
+- **Partes en su propia ventana:** el historial, el desglose, la proyección, el uso por producto, la ventana de contexto y cada pregunta del Panel se pueden sacar a una ventana flotante y poner donde quieras. Con varias cuentas, cada una dice de qué cuenta es.
 - **Las ventanas no se tapan:** si sueltas una encima de otra, se acomoda al lado y se imanta a los bordes. Solo Ajustes puede quedar encima mientras está abierto.
 - **Ventanas y paneles estirables:** arrastra los bordes del widget, de un panel abierto o de una parte separada para cambiar su tamaño; las letras no cambian de tamaño y cada uno recuerda el suyo (doble clic en un borde para volver al tamaño original).
 - Tema claro, oscuro o automático, transparencia, escala de 70% a 160% y **colores propios** (acento y colores de las barras).

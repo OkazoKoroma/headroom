@@ -54,6 +54,9 @@ contextBridge.exposeInMainWorld('widget', {
 
   // Cambia entre la disposición vertical y la horizontal (solo en la vista normal).
   alternarOrientacion: () => ipcRenderer.send('alternar-orientacion'),
+  // Menos (-1) o más (+1) información: pasa al tamaño anterior o siguiente
+  cambiarTamano: (paso) => ipcRenderer.send('cambiar-tamano', paso),
+  asomar: () => ipcRenderer.send('asomar'), // la mínima: muestra la compacta un momento
 
   // Sube (paso positivo) o baja (paso negativo) el tamaño del widget, en puntos porcentuales. Lo usa Ctrl + rueda del mouse.
   cambiarEscala: (paso) => ipcRenderer.send('cambiar-escala', paso),
@@ -72,6 +75,7 @@ contextBridge.exposeInMainWorld('widget', {
   // Copia de seguridad: guardar todo en un archivo, o restaurarlo (pide confirmación y vuelve a abrir la app).
   // Estadísticas (récords, rachas, costumbres) y el informe para guardar o imprimir.
   obtenerEstadisticas: () => ipcRenderer.invoke('obtener-estadisticas'),
+  obtenerPanel: () => ipcRenderer.invoke('obtener-panel'), // todo lo que muestra el Panel (por preguntas)
   guardarInforme: () => ipcRenderer.invoke('guardar-informe'),
   guardarCopia: () => ipcRenderer.invoke('guardar-copia'),
   restaurarCopia: () => ipcRenderer.invoke('restaurar-copia'),
@@ -105,6 +109,7 @@ contextBridge.exposeInMainWorld('widget', {
   // Cuentas de Claude: mostrar otra en la tarjeta, agregar (responde { ok } o { ok: false, error }), renombrar,
   // eliminar, y cerrar o iniciar la sesión de una cuenta.
   activarCuenta: (id) => ipcRenderer.send('cuentas-activar', id),
+  panelTodas: (todas) => ipcRenderer.send('panel-todas', todas), // el Panel: "Todas" (true) o una cuenta (false)
   agregarCuenta: (nombre) => ipcRenderer.invoke('cuentas-agregar', nombre),
   renombrarCuenta: (id, nombre) => ipcRenderer.invoke('cuentas-renombrar', id, nombre),
   eliminarCuenta: (id) => ipcRenderer.invoke('cuentas-eliminar', id),

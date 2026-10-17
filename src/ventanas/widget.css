@@ -68,7 +68,7 @@ body.abajo .escena {
 .tarjeta {
   flex: none;
   /* --extra-alto: lo que estiraste la ventana a lo alto; --n-extras: cuántos límites extra (como Fable) hay, 46 px cada uno */
-  height: calc(184px + 46px * var(--n-extras, 0) + var(--extra-alto, 0px));
+  height: calc(206px + 46px * var(--n-extras, 0) + var(--extra-alto, 0px)); /* ...y la fila de pestañas (22) */
   padding: 38px 18px 14px;   /* arriba queda una fila para la cuenta y la barra de íconos */
   animation: entrada 0.65s var(--suave) both;
   transition: height 0.3s var(--suave), padding 0.3s var(--suave); /* 0,3 s = DURACION_TARJETA_MS en main.js */
@@ -323,10 +323,6 @@ body.compacto .herramientas {
   position: static;
 }
 
-/* En la vista compacta solo queda el botón para volver a la vista normal */
-body.compacto .herramientas .boton-icono:not(#boton-compacto) {
-  display: none;
-}
 
 body.compacto #vista-sesion {
   flex-direction: row;
@@ -2231,7 +2227,7 @@ body.sin-barras .tarjeta .medidor-texto {
 }
 
 body.sin-barras:not(.compacto):not(.franja):not(.mini) .tarjeta {
-  height: calc(160px + 38px * var(--n-extras, 0) + var(--extra-alto, 0px));
+  height: calc(182px + 38px * var(--n-extras, 0) + var(--extra-alto, 0px));
 }
 
 body.sin-barras.franja .tarjeta {
@@ -2420,11 +2416,11 @@ body.sin-hoy .resumen-fila .resumen-medidor:first-of-type {
 
 /* La tarjeta vertical pierde un medidor (38 px; 25 sin barras) */
 body.sin-hoy:not(.compacto):not(.franja):not(.mini) .tarjeta {
-  height: calc(138px + 46px * var(--n-extras, 0) + var(--extra-alto, 0px));
+  height: calc(160px + 46px * var(--n-extras, 0) + var(--extra-alto, 0px));
 }
 
 body.sin-hoy.sin-barras:not(.compacto):not(.franja):not(.mini) .tarjeta {
-  height: calc(122px + 38px * var(--n-extras, 0) + var(--extra-alto, 0px));
+  height: calc(144px + 38px * var(--n-extras, 0) + var(--extra-alto, 0px));
 }
 
 /* Vista compacta: en vez de Hoy se ve la sesión de 5 horas (en la tarjeta y en la lista) */
@@ -2664,28 +2660,6 @@ body.compacto .detalle {
 
 /* ===== Rediseño de las vistas (0.19.0) ===== */
 
-/* ----- La barra de íconos: cinco a la vista (⋯, disposición, Ajustes, completa, panel de control); el resto, detrás de "⋯" ----- */
-body:not(.mas-abierto) #boton-historial,
-body:not(.mas-abierto) #boton-desglose,
-body:not(.mas-abierto) #boton-proyeccion,
-body:not(.mas-abierto) #boton-productos,
-body:not(.mas-abierto) #boton-compacto,
-body:not(.mas-abierto) #boton-mini {
-  display: none;
-}
-
-/* (en la compacta solo queda el botón de volver, como siempre) */
-body.compacto #boton-mas {
-  display: none;
-}
-
-body.franja .herramientas {
-  grid-template-columns: repeat(5, 18px);
-}
-
-body.franja.mas-abierto .herramientas {
-  grid-template-columns: repeat(6, 18px);
-}
 
 /* ----- Franja (horizontal, completa y panel de control): el número grande a la izquierda de cada columna ----- */
 body.franja .medidor-texto {
@@ -2935,7 +2909,7 @@ body.todas.compacto .resumen-fila {
 }
 
 body.compacto .tarjeta .etiqueta {
-  letter-spacing: 0.5px;
+  letter-spacing: 0.2px;
 }
 
 /* ----- Completa: el desglose toma su alto natural y la proyección se queda con el resto ----- */
@@ -3172,4 +3146,732 @@ body.tablero:not(.ajustes-abierto) .tablero-graficos .tablero-celda .grafico .co
   height: 100%;
   max-height: 100%;
   overflow: hidden;
+}
+
+/* ===== Pestañas con nombre y barra de cuatro botones (0.20.0) ===== */
+
+/* Las pestañas: al pie de la tarjeta (y de la lista de cuentas), con una línea fina arriba. La activa va en naranja. */
+.pestanas {
+  -webkit-app-region: no-drag;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 21px;
+  margin-top: 1px;
+  border-top: 1px solid var(--separador);
+}
+
+.pestana {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--texto-suave);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.pestana:hover {
+  color: var(--texto);
+}
+
+.pestana[aria-pressed='true'] {
+  color: var(--acento);
+}
+
+.pestana:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Sin pestañas en la compacta, la mínima y las vistas con los paneles a la vista */
+body.compacto .pestanas,
+body.mini .pestanas,
+body.completo .pestanas,
+body.vista-cuentas .pestanas,
+body.parte .pestanas {
+  display: none;
+}
+
+/* La lista de cuentas: las pestañas van al pie, dentro de la lista */
+.resumen-cuentas .pestanas {
+  order: 100; /* al final de la lista (las filas se agregan después en el DOM) */
+  margin-top: 6px;
+}
+
+body.completo .resumen-cuentas .pestanas {
+  display: none;
+}
+
+/* La barra: cuatro botones (disposición, −, +, Ajustes). Los de − y + llevan fondo, como pastillas. */
+.boton-tamano {
+  font-family: var(--mono, ui-monospace, Consolas, monospace);
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--fila);
+  color: var(--texto);
+}
+
+.boton-tamano:disabled {
+  opacity: 0.35;
+  cursor: default;
+  background: transparent;
+}
+
+.boton-tamano:disabled:hover {
+  color: var(--texto);
+  background: transparent;
+}
+
+/* Horizontal: los números solos en su fila; abajo, las pestañas con los cuatro botones pegados a la derecha */
+body.horizontal .tarjeta {
+  height: calc(112px + var(--extra-alto, 0px));
+  padding: 12px 18px 10px;
+}
+
+body.horizontal #vista-datos:not(.oculto) {
+  grid-template-columns: repeat(var(--n-medidores, 3), minmax(0, 1fr));
+  grid-template-rows: 1fr auto;
+}
+
+body.horizontal .pestanas {
+  grid-column: 1 / -1;
+  margin-top: 6px;
+  height: 20px;
+}
+
+body.horizontal .herramientas {
+  position: absolute;
+  top: auto;
+  right: 16px;
+  bottom: 9px;
+  display: flex;
+  grid-template-columns: none;
+  gap: 3px;
+}
+
+/* Vista completa y panel de control: la barra, arriba a la derecha, en una fila (ya no hay paneles que abrir) */
+body.completo .herramientas {
+  display: flex;
+  grid-template-columns: none;
+  gap: 3px;
+}
+
+/* Compacta: solo − y + (la disposición y Ajustes se usan desde la normal) */
+body.compacto .herramientas .boton-icono {
+  display: none;
+}
+
+body.compacto .herramientas .boton-tamano {
+  display: grid;
+}
+
+/* El riel de las barras se ve de lado a lado (gris suave): así se nota cuánto queda, no solo cuánto va */
+.barra {
+  background: color-mix(in srgb, var(--texto-suave) 22%, transparent);
+}
+
+/* Hoy: el "de 14%" va chico, pegado al número */
+.porcentaje-sufijo {
+  margin-left: 3px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--texto-suave);
+}
+
+body.compacto .tarjeta .porcentaje-sufijo {
+  display: none;
+}
+
+/* Los números, en letra de ancho fijo (como en la maqueta); el signo % va chico y se esconde si no hay número */
+.porcentaje,
+.resumen-valor,
+.tablero-numero b,
+.est-ficha-valor,
+.chat-porcentaje,
+.valor-producto,
+.boton-tamano {
+  font-family: 'Cascadia Mono', Consolas, 'Segoe UI', monospace;
+}
+
+.porcentaje-signo {
+  margin-left: 1px;
+}
+
+.porcentaje > span:empty + .porcentaje-sufijo {
+  display: none;
+}
+
+/* Los botones − y + como pastillas, un poco más visibles */
+.boton-tamano {
+  width: 20px;
+  background: color-mix(in srgb, var(--texto-suave) 20%, transparent);
+}
+
+/* Con cuatro botones en la barra, la pestañita de la cuenta tiene más lugar para su nombre */
+body:not(.compacto):not(.franja) .cuenta-pestana {
+  max-width: 150px;
+}
+
+/* ===== El Panel por preguntas (0.21.0) ===== */
+/* La sección de abajo se desplaza (el Panel es más alto que la ventana en pantallas bajas) */
+body.tablero:not(.ajustes-abierto) .tablero-graficos {
+  display: block;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 16px 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll) transparent;
+}
+
+.pnl {
+  -webkit-app-region: no-drag;
+  display: grid;
+  gap: 0;
+}
+
+.pnl-franja {
+  display: grid;
+  gap: 10px;
+  padding: 10px 0 14px;
+  border-bottom: 1px solid var(--separador);
+}
+
+.pnl-franja:last-child {
+  border-bottom: none;
+}
+
+.pnl-pregunta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  color: var(--texto);
+}
+
+.pnl-pregunta small {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--texto-suave);
+}
+
+.pnl-fila {
+  display: grid;
+  gap: 10px 18px;
+  min-width: 0;
+}
+
+.pnl-1 { grid-template-columns: minmax(0, 1fr); }
+.pnl-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.pnl-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.pnl-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.pnl-mapa { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); }
+
+.pnl-ficha {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--fila);
+}
+
+.pnl-bloque {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 3px;
+  min-width: 0;
+}
+
+.pnl-bloque[hidden],
+.pnl-ficha[hidden] {
+  display: none;
+}
+
+.pnl-etq,
+.pnl-tit {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  color: var(--etiqueta);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pnl-num {
+  font-family: 'Cascadia Mono', Consolas, 'Segoe UI', monospace;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.4px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pnl-ficha .pnl-num {
+  font-size: 18px;
+}
+
+.pnl-det {
+  font-size: 10.5px;
+  color: var(--texto-suave);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pnl-det:empty {
+  display: none;
+}
+
+.pnl-graf {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  height: 96px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pnl-graf .columnas {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pnl-oculto {
+  display: none;
+}
+
+.pnl-mapa-cuerpo {
+  height: 96px;
+}
+
+.pnl-stack {
+  display: flex;
+  height: 8px;
+  gap: 1px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--texto-suave) 22%, transparent);
+}
+
+.pnl-stack i {
+  display: block;
+  height: 100%;
+}
+
+.pnl-lista {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 3px 14px;
+}
+
+.pnl-prod-fila {
+  display: grid;
+  grid-template-columns: 9px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  font-size: 11px;
+}
+
+.pnl-prod-fila i {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  display: block;
+}
+
+.pnl-prod-nombre {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pnl-prod-valor {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.pnl-tramos {
+  display: flex;
+  height: 10px;
+  gap: 1px;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.pnl-tramos i {
+  display: block;
+  height: 100%;
+}
+
+.pnl-tramos-etq {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--etiqueta);
+  margin-top: 6px;
+}
+
+.grafico-barras .eje {
+  stroke: color-mix(in srgb, var(--texto-suave) 35%, transparent);
+  stroke-width: 1;
+}
+
+/* ===== Panel (0.22.0): sin el bloque de historial, desglose y proyección (sus datos están en las franjas de abajo) ===== */
+body.tablero:not(.ajustes-abierto) .panel,
+body.tablero:not(.ajustes-abierto).abajo .panel,
+body.tablero:not(.ajustes-abierto).panel-abierto .panel,
+body.tablero:not(.ajustes-abierto).abajo.panel-abierto .panel {
+  display: none;
+}
+
+/* La sección de las preguntas se queda con todo ese alto (250 + 8 de separación) y con lo que estires la ventana */
+body.tablero:not(.ajustes-abierto) .tablero-graficos {
+  height: calc(618px - var(--tablero-recorte, 0px) + var(--extra-alto, 0px));
+}
+
+/* ===== Panel con varias cuentas (0.23.0): pastillas arriba, con −, + y Ajustes a la derecha ===== */
+.pastillas-cuentas {
+  display: none;
+}
+
+body.tablero.con-resumen .pastillas-cuentas {
+  -webkit-app-region: no-drag;
+  order: 4;                 /* arriba de todo (la escena del Panel va de abajo hacia arriba) */
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 24px;
+  margin-bottom: 8px;
+  width: 100%;
+  max-width: var(--ancho-vista, none);
+  align-self: flex-start;
+}
+
+.pastillas-lista {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.pastilla-cuenta {
+  flex: none;
+  max-width: 160px;
+  height: 22px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--fondo-a) calc(var(--op) * 100%), transparent);
+  box-shadow: inset 0 0 0 1px var(--borde);
+  color: var(--etiqueta);
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.pastilla-cuenta:hover {
+  color: var(--texto);
+}
+
+.pastilla-cuenta[aria-selected='true'] {
+  color: var(--acento);
+  background: var(--acento-suave);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--acento) 45%, transparent);
+}
+
+.pastilla-cuenta:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 1px;
+}
+
+.pastillas-botones {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: auto;
+  margin-right: 4px;
+}
+
+.pastillas-botones .boton-icono {
+  width: 20px;
+  height: 20px;
+}
+
+/* Los botones van en la fila de pastillas: los de la tarjeta sobran */
+body.tablero.con-resumen .tarjeta .herramientas {
+  display: none;
+}
+
+/* Una cuenta: su cabecera (la tarjeta), sin las filas por cuenta. "Todas": las filas por cuenta en lugar de la cabecera */
+body.tablero.con-resumen:not(.panel-todas) .resumen-cuentas {
+  display: none;
+}
+
+body.tablero.con-resumen.panel-todas .tarjeta {
+  display: none;
+}
+
+/* La compacta: cada medidor abre su panel (no arrastra la ventana) */
+body.compacto #vista-datos .medidor {
+  -webkit-app-region: no-drag;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+body.compacto #vista-datos .medidor:hover {
+  background: var(--hover-fondo);
+}
+
+body.compacto .tarjeta .medidor-texto {
+  cursor: pointer;
+}
+
+/* ===== Panel como la maqueta (0.24.0) ===== */
+/* Hoy en las vistas en franja: el número solo; "de 14% · límite ~20:14" debajo */
+.solo-franja {
+  display: none;
+}
+
+body.franja .tarjeta #hoy-detalle-franja {
+  display: block;
+}
+
+body.franja .tarjeta #hoy-de,
+body.franja .tarjeta #hoy-detalle-corto {
+  display: none;
+}
+
+/* Cabecera y preguntas en una sola tarjeta (sin el hueco entre las dos), salvo que haya otras cosas entre medio */
+body.tablero:not(.ajustes-abierto):not(.con-chats):not(.panel-todas) .tarjeta {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: none;
+}
+
+body.tablero:not(.ajustes-abierto):not(.con-chats):not(.panel-todas) .tablero-graficos {
+  margin-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: 1px solid var(--separador);
+  height: calc(626px - var(--tablero-recorte, 0px) + var(--extra-alto, 0px)); /* (+8: el hueco que ya no está) */
+}
+
+/* (en las vistas en franja, el % chico junto al número de Hoy, igual que en Sesión y Semana) */
+body.franja .tarjeta #hoy-numero:not(:empty)::after {
+  content: '%';
+  margin-left: 1px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--texto-suave);
+}
+
+/* ===== Panel tal cual la maqueta (0.24.1) ===== */
+/* Cada bloque: el título arriba; el número y, a su lado, el texto chico; debajo, el gráfico */
+.pnl-bloque {
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: none;
+  grid-auto-rows: auto;
+  column-gap: 8px;
+  row-gap: 3px;
+  align-items: baseline;
+  align-content: start;
+}
+
+.pnl-bloque > .pnl-tit {
+  grid-column: 1 / -1;
+}
+
+.pnl-bloque > .pnl-num {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.pnl-bloque > .pnl-det {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+}
+
+.pnl-bloque > .pnl-graf,
+.pnl-bloque > .est-mapa,
+.pnl-bloque > .pnl-stack,
+.pnl-bloque > .pnl-lista,
+.pnl-bloque > .pnl-tramos,
+.pnl-bloque > .pnl-tramos-etq,
+.pnl-bloque > .historial-promedio {
+  grid-column: 1 / -1;
+}
+
+.pnl-bloque > .pnl-graf,
+.pnl-bloque > .est-mapa {
+  margin-top: 4px;
+}
+
+/* La cabecera del Panel (y las vistas en franja): el % del mismo tamaño que el número, como "10%" */
+body.franja .tarjeta .porcentaje-signo,
+body.franja .tarjeta #hoy-numero:not(:empty)::after {
+  margin-left: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
+/* Las pastillas van dentro de la tarjeta (arriba de la cabecera), como en la maqueta: misma superficie, sin hueco */
+body.tablero.con-resumen .pastillas-cuentas {
+  box-sizing: border-box;
+  height: 32px;
+  margin-bottom: 0;
+  padding: 8px 14px 0;
+  border: 1px solid var(--borde);
+  border-bottom: none;
+  border-radius: 16px 16px 0 0;
+  background: linear-gradient(155deg,
+    color-mix(in srgb, var(--fondo-a) calc(var(--op) * 100%), transparent) 0%,
+    color-mix(in srgb, var(--fondo-b) calc(var(--op) * 100%), transparent) 100%);
+}
+
+body.tablero.con-resumen:not(.panel-todas) .tarjeta {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: none;
+}
+
+body.tablero.con-resumen.panel-todas .resumen-cuentas {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+/* Con las pastillas, la pestañita de la cuenta sobra (la cuenta elegida ya está marcada en su pastilla) */
+body.tablero.con-resumen .cuenta-pestana {
+  display: none;
+}
+
+/* El último tramo "en curso" (hoy o la semana actual, que van a medias): punteado y más tenue */
+.grafico-dia .serie.en-curso {
+  stroke-dasharray: 3 3;
+  opacity: 0.7;
+}
+
+/* ===== Las franjas del Panel en su propia ventana (0.26.0) ===== */
+.pnl-pregunta {
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.pnl-pregunta small {
+  margin-left: auto;
+}
+
+.pnl-acciones {
+  -webkit-app-region: no-drag;
+  display: inline-flex;
+  gap: 2px;
+}
+
+.pnl-acciones .boton-cerrar {
+  width: 18px;
+  height: 18px;
+}
+
+.pnl-juntar,
+body.parte-pnl .pnl-separar {
+  display: none;
+}
+
+body.parte-pnl .pnl-juntar {
+  display: grid;
+}
+
+/* En el Panel, las franjas que están en su propia ventana no se repiten */
+body.separada-pnl-ahora #pnl-f-ahora,
+body.separada-pnl-semana #pnl-f-semana,
+body.separada-pnl-habitos #pnl-f-habitos,
+body.separada-pnl-anio #pnl-f-anio {
+  display: none;
+}
+
+/* La ventana de una franja: solo esa franja, en su tarjeta; se arrastra por su título */
+body.parte-pnl .tarjeta,
+body.parte-pnl .panel,
+body.parte-pnl .chats,
+body.parte-pnl .resumen-cuentas,
+body.parte-pnl .pastillas-cuentas {
+  display: none !important;
+}
+
+body.parte-pnl .tablero-graficos {
+  box-sizing: border-box;
+  display: block;
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  padding: 4px 16px 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 16px;
+  border: 1px solid var(--borde);
+  background: linear-gradient(155deg,
+    color-mix(in srgb, var(--fondo-a) calc(var(--op) * 100%), transparent) 0%,
+    color-mix(in srgb, var(--fondo-b) calc(var(--op) * 100%), transparent) 100%);
+  -webkit-app-region: drag;
+}
+
+body.parte-pnl .pnl-franja {
+  display: none;
+  border-bottom: none;
+}
+
+body.parte-pnl-ahora #pnl-f-ahora,
+body.parte-pnl-semana #pnl-f-semana,
+body.parte-pnl-habitos #pnl-f-habitos,
+body.parte-pnl-anio #pnl-f-anio {
+  display: grid;
+}
+
+body.parte-pnl .pnl-pregunta {
+  -webkit-app-region: drag;
+  cursor: grab;
+}
+
+/* La compacta: el "%" de cada número sí se ve (lo que se esconde es el "de 14%" de Hoy) */
+body.compacto .tarjeta .porcentaje-signo {
+  display: inline;
+}
+
+/* La compacta: Hoy también lleva su "%" chico (su "de 14%" no cabe y se esconde) */
+body.compacto .tarjeta #hoy-numero:not(:empty)::after {
+  content: '%';
+  margin-left: 1px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--texto-suave);
 }
