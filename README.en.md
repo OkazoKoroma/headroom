@@ -63,11 +63,11 @@ The **−** and **+** buttons move from one view to the next, from less to more 
 
 ### The dashboard
 
-**Everything at once, organized by questions:** How am I doing right now? (pace, what's left today, today's sessions, when you started), How is the week going? (against last week day by day, where you'd end up, by product), When and how do I use Claude? (day-and-hour map, by weekday, your typical day, streaks) and How is my year going?
+**Everything at once, organized by questions:** How am I doing right now? (pace, what's left today, today's sessions, when you started), How is the week going? (against last week day by day, where you'd end up, by product), When and how do I use Claude? (day-and-hour map, by weekday, your typical day, streaks), How is my year going? (how each week ended, month by month, records) and How often did I hit the limit? (Fable and sessions run out per week)
 
 ![The dashboard with one account](docs/captura-panel.png)
 
-**Each dashboard question in its own window.** The button next to its title pops it out into a floating window; its X sends it back:
+**Each dashboard question in its own window.** The button next to its title pops it out into a floating window; its X sends it back. These windows can be dragged from anywhere, made narrower (cards move to more rows and the height adjusts itself) and, stretched from the bottom, make their charts bigger. At the top of the dashboard, a pill for each one brings it to the front or sends it back:
 
 ![A dashboard section in its own window](docs/captura-panel-ventana.png)
 

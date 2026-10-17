@@ -1450,7 +1450,7 @@ observadorDeTamano.observe(document.getElementById('columnas'));
 observadorDeTamano.observe(document.getElementById('productos-columnas'));
 observadorDeTamano.observe(document.getElementById('pnl-semvs-col')); // (el Panel: todos sus gráficos cambian de ancho a la vez)
 // (en la ventana propia de una franja, se mira un gráfico de esa franja)
-for (const id of ['pnl-pordia-col', 'pnl-semanas-col']) observadorDeTamano.observe(document.getElementById(id));
+for (const id of ['pnl-pordia-col', 'pnl-semanas-col', 'pnl-sessem-col']) observadorDeTamano.observe(document.getElementById(id));
 
 // --- Uso por producto a lo largo del tiempo ---
 // Una línea por producto (con el color de siempre: Claude Code naranja, Chats azul...). Eje Y: % de la cuota semanal que usó.
@@ -1925,6 +1925,66 @@ document.getElementById('vista-datos').addEventListener('click', (evento) => {
   const panel = ['historial', 'proyeccion', 'desglose'][indice] || 'productos';
   abrirPanel(panel);
 });
+
+// En la ventana de una franja del Panel: si su contenido ya no cabe (al angostarla pasa a más filas), se pide más alto
+if (PARTE && PARTE.startsWith('pnl-')) {
+  const graficos = document.querySelector('.tablero-graficos');
+  const franja = document.getElementById(`pnl-f-${PARTE.slice(4)}`);
+  let ultimoPedido = 0;
+  const medirAlto = () => {
+    if (!graficos || !franja) return;
+    const estilo = getComputedStyle(graficos);
+    const relleno = parseFloat(estilo.paddingTop) + parseFloat(estilo.paddingBottom);
+    // Las filas de gráficos (los que están uno al lado del otro cuentan como una): ahí va lo que la ventana se estiró de más
+    const arriba = franja.getBoundingClientRect().top;
+    const alturas = [...franja.querySelectorAll('.pnl-graf')].filter((g) => g.offsetParent !== null).map((g) => g.getBoundingClientRect().top - arriba).sort((a, b) => a - b);
+    const filas = alturas.filter((alto, i) => i === 0 || alto - alturas[i - 1] > 40).length;
+    const agrandado = parseFloat(document.body.style.getPropertyValue('--pnl-graf-extra')) || 0;
+    const natural = franja.offsetHeight - agrandado * filas; // (lo que ocupa con los gráficos de su tamaño normal)
+    const extra = filas ? Math.max(0, Math.floor((graficos.clientHeight - relleno - natural) / filas)) : 0;
+    if (extra !== agrandado) document.body.style.setProperty('--pnl-graf-extra', `${extra}px`);
+    const contenido = natural + relleno;
+    const necesario = Math.ceil(innerHeight - graficos.clientHeight + contenido);
+    if (necesario !== ultimoPedido) { // (también cuando baja: así se puede volver a achicar a lo alto)
+      ultimoPedido = necesario;
+      window.widget.altoDelContenido(necesario);
+    }
+  };
+  const observador = new ResizeObserver(() => requestAnimationFrame(medirAlto));
+  if (franja) observador.observe(franja);
+  if (graficos) observador.observe(graficos);
+}
+
+// Arriba del Panel, una pastilla por cada franja que está en su propia ventana: su nombre trae esa ventana al frente,
+// y la flechita la devuelve al Panel.
+const ORDEN_DE_FRANJAS = ['pnl-ahora', 'pnl-semana', 'pnl-habitos', 'pnl-anio', 'pnl-anio2'];
+function dibujarAfuera(separadas) {
+  const caja = document.getElementById('pnl-afuera');
+  const lista = document.getElementById('pnl-afuera-lista');
+  if (!caja || !lista) return;
+  const afuera = PARTE ? [] : ORDEN_DE_FRANJAS.filter((franja) => separadas.includes(franja));
+  lista.textContent = '';
+  for (const franja of afuera) {
+    const pastilla = document.createElement('span');
+    pastilla.className = 'pnl-afuera-pastilla';
+    const nombre = document.createElement('button');
+    nombre.type = 'button';
+    nombre.className = 'pnl-afuera-nombre';
+    nombre.textContent = t(`pnl.${franja.slice(4)}`);
+    nombre.title = t('pnl.mostrar');
+    nombre.addEventListener('click', () => window.widget.mostrarParte(franja));
+    const volver = document.createElement('button');
+    volver.type = 'button';
+    volver.className = 'pnl-afuera-volver';
+    volver.title = t('pnl.juntar');
+    volver.setAttribute('aria-label', t('pnl.juntar'));
+    volver.innerHTML = '<svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4 2.5 7.5 6 11"/><path d="M2.5 7.5h7a4 4 0 0 1 4 4v1"/></svg>';
+    volver.addEventListener('click', () => window.widget.juntarParteDe(franja));
+    pastilla.append(nombre, volver);
+    lista.append(pastilla);
+  }
+  caja.hidden = afuera.length === 0;
+}
 
 // Las franjas del Panel: el botón ↗ la saca a su propia ventana; en esa ventana, la X la devuelve al Panel
 for (const boton of document.querySelectorAll('[data-separar]')) {

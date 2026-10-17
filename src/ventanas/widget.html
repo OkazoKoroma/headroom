@@ -430,6 +430,8 @@
     <!-- El Panel: debajo de la vista completa, cuatro preguntas (ahora, la semana, los hábitos y el año). widget.js lo dibuja. -->
     <section class="tablero-graficos" id="tablero" aria-label="Panel" data-i18n-aria="tablero.titulo">
       <div class="pnl">
+        <!-- Las franjas que están en su propia ventana (el Panel no las repite): una pastilla por cada una -->
+        <div class="pnl-afuera" id="pnl-afuera" hidden><span class="pnl-afuera-titulo" data-i18n="pnl.afuera">En su propia ventana:</span><span class="pnl-afuera-lista" id="pnl-afuera-lista"></span></div>
         <div class="pnl-franja" id="pnl-f-ahora">
           <h3 class="pnl-pregunta"><span data-i18n="pnl.ahora">¿Cómo voy ahora?</span><small data-i18n="pnl.ahora.nota">con las lecturas de hoy</small><span class="pnl-acciones"><button class="boton-cerrar pnl-separar" data-separar="pnl-ahora" type="button" title="Sacar a su propia ventana" data-i18n-title="parte.separar" aria-label="Sacar a su propia ventana" data-i18n-aria="parte.separar"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M11.5 9.5v3a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3"/></svg></button><button class="boton-cerrar pnl-juntar" type="button" title="Volver al Panel" data-i18n-title="pnl.juntar" aria-label="Volver al Panel" data-i18n-aria="pnl.juntar"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></span></h3>
           <div class="pnl-fila pnl-4">
@@ -464,22 +466,34 @@
           <div class="pnl-ficha" id="pnl-sinuso"><span class="pnl-etq" data-i18n="pnl.diasSinUso">Días sin uso</span><b class="pnl-num" id="pnl-sinuso-num">—</b><span class="pnl-det" id="pnl-sinuso-det"></span></div>
           </div>
         </div>
+        <!-- ¿Cómo voy en el año?: dos mitades lado a lado; cada una se puede sacar a su propia ventana -->
+        <div class="pnl-par" id="pnl-par-anio">
         <div class="pnl-franja" id="pnl-f-anio">
           <h3 class="pnl-pregunta"><span data-i18n="pnl.anio">¿Cómo voy en el año?</span><small data-i18n="pnl.anio.nota">hasta 12 meses</small><span class="pnl-acciones"><button class="boton-cerrar pnl-separar" data-separar="pnl-anio" type="button" title="Sacar a su propia ventana" data-i18n-title="parte.separar" aria-label="Sacar a su propia ventana" data-i18n-aria="parte.separar"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M11.5 9.5v3a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3"/></svg></button><button class="boton-cerrar pnl-juntar" type="button" title="Volver al Panel" data-i18n-title="pnl.juntar" aria-label="Volver al Panel" data-i18n-aria="pnl.juntar"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></span></h3>
-          <div class="pnl-fila pnl-2">
+          <div class="pnl-fila pnl-1">
           <div class="pnl-bloque" id="pnl-semanas"><span class="pnl-tit" data-i18n="pnl.semanasFin" id="pnl-semanas-tit">Semana: cómo terminó cada una</span><b class="pnl-num" id="pnl-semanas-num">—</b><div class="pnl-graf" id="pnl-semanas-graf"><div class="columnas" id="pnl-semanas-col"></div></div><span class="historial-promedio pnl-oculto" id="pnl-semanas-leyenda"></span><span class="pnl-det" id="pnl-semanas-det"></span></div>
-          <div class="pnl-bloque" id="pnl-fablesem"><span class="pnl-tit" data-i18n="pnl.fableFin" id="pnl-fablesem-tit">Fable: cómo terminó cada una</span><b class="pnl-num" id="pnl-fablesem-num">—</b><div class="pnl-graf" id="pnl-fablesem-graf"><div class="columnas" id="pnl-fablesem-col"></div></div><span class="historial-promedio pnl-oculto" id="pnl-fablesem-leyenda"></span><span class="pnl-det" id="pnl-fablesem-det"></span></div>
+          </div>
+          <div class="pnl-fila pnl-1">
+          <div class="pnl-bloque" id="pnl-meses"><span class="pnl-tit" data-i18n="pnl.mesAMes" id="pnl-meses-tit">Mes a mes</span><b class="pnl-num" id="pnl-meses-num">—</b><div class="pnl-graf" id="pnl-meses-graf"><div class="columnas" id="pnl-meses-col"></div></div><span class="historial-promedio pnl-oculto" id="pnl-meses-leyenda"></span><span class="pnl-det" id="pnl-meses-det"></span></div>
           </div>
           <div class="pnl-fila pnl-2">
-          <div class="pnl-bloque" id="pnl-meses"><span class="pnl-tit" data-i18n="pnl.mesAMes" id="pnl-meses-tit">Mes a mes</span><b class="pnl-num" id="pnl-meses-num">—</b><div class="pnl-graf" id="pnl-meses-graf"><div class="columnas" id="pnl-meses-col"></div></div><span class="historial-promedio pnl-oculto" id="pnl-meses-leyenda"></span><span class="pnl-det" id="pnl-meses-det"></span></div>
-          <div class="pnl-bloque" id="pnl-sessem"><span class="pnl-tit" data-i18n="pnl.sesionesSemana" id="pnl-sessem-tit">Sesiones agotadas por semana</span><b class="pnl-num" id="pnl-sessem-num">—</b><div class="pnl-graf" id="pnl-sessem-graf"><div class="columnas" id="pnl-sessem-col"></div></div><span class="historial-promedio pnl-oculto" id="pnl-sessem-leyenda"></span><span class="pnl-det" id="pnl-sessem-det"></span></div>
-          </div>
-          <div class="pnl-fila pnl-4">
           <div class="pnl-ficha" id="pnl-masalto"><span class="pnl-etq" data-i18n="est.masAlto">Día más alto</span><b class="pnl-num" id="pnl-masalto-num">—</b><span class="pnl-det" id="pnl-masalto-det"></span></div>
           <div class="pnl-ficha" id="pnl-semmax"><span class="pnl-etq" data-i18n="pnl.semanaMax">Semana más alta · más baja</span><b class="pnl-num" id="pnl-semmax-num">—</b><span class="pnl-det" id="pnl-semmax-det"></span></div>
+          </div>
+        </div>
+        <div class="pnl-franja" id="pnl-f-anio2">
+          <h3 class="pnl-pregunta"><span data-i18n="pnl.anio2">¿Cuántas veces llegué al tope?</span><small data-i18n="pnl.anio.nota">hasta 12 meses</small><span class="pnl-acciones"><button class="boton-cerrar pnl-separar" data-separar="pnl-anio2" type="button" title="Sacar a su propia ventana" data-i18n-title="parte.separar" aria-label="Sacar a su propia ventana" data-i18n-aria="parte.separar"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M11.5 9.5v3a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3"/></svg></button><button class="boton-cerrar pnl-juntar" type="button" title="Volver al Panel" data-i18n-title="pnl.juntar" aria-label="Volver al Panel" data-i18n-aria="pnl.juntar"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></span></h3>
+          <div class="pnl-fila pnl-1">
+          <div class="pnl-bloque" id="pnl-fablesem"><span class="pnl-tit" data-i18n="pnl.fableFin" id="pnl-fablesem-tit">Fable: cómo terminó cada una</span><b class="pnl-num" id="pnl-fablesem-num">—</b><div class="pnl-graf" id="pnl-fablesem-graf"><div class="columnas" id="pnl-fablesem-col"></div></div><span class="historial-promedio pnl-oculto" id="pnl-fablesem-leyenda"></span><span class="pnl-det" id="pnl-fablesem-det"></span></div>
+          </div>
+          <div class="pnl-fila pnl-1">
+          <div class="pnl-bloque" id="pnl-sessem"><span class="pnl-tit" data-i18n="pnl.sesionesSemana" id="pnl-sessem-tit">Sesiones agotadas por semana</span><b class="pnl-num" id="pnl-sessem-num">—</b><div class="pnl-graf" id="pnl-sessem-graf"><div class="columnas" id="pnl-sessem-col"></div></div><span class="historial-promedio pnl-oculto" id="pnl-sessem-leyenda"></span><span class="pnl-det" id="pnl-sessem-det"></span></div>
+          </div>
+          <div class="pnl-fila pnl-2">
           <div class="pnl-ficha" id="pnl-fablemax"><span class="pnl-etq" data-i18n="pnl.fableMax">Fable, semana más alta</span><b class="pnl-num" id="pnl-fablemax-num">—</b><span class="pnl-det" id="pnl-fablemax-det"></span></div>
           <div class="pnl-ficha" id="pnl-pctagot"><span class="pnl-etq" data-i18n="pnl.pctAgotadas">Semanas en que agotaste la cuota</span><b class="pnl-num" id="pnl-pctagot-num">—</b><span class="pnl-det" id="pnl-pctagot-det"></span></div>
           </div>
+        </div>
         </div>
       </div>
     </section>

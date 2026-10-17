@@ -63,11 +63,11 @@ La **normal** puede ser vertical (la tarjeta de arriba) u **horizontal**:
 
 ### El Panel
 
-**Todo a la vez, ordenado por preguntas:** ¿Cómo voy ahora? (ritmo, cuánto te queda hoy, sesiones del día, a qué hora empezaste), ¿Cómo va la semana? (contra la pasada día a día, cómo terminarías, por producto), ¿Cuándo y cómo uso Claude? (mapa de día y hora, por día de la semana, tu día tipo, rachas) y ¿Cómo voy en el año?
+**Todo a la vez, ordenado por preguntas:** ¿Cómo voy ahora? (ritmo, cuánto te queda hoy, sesiones del día, a qué hora empezaste), ¿Cómo va la semana? (contra la pasada día a día, cómo terminarías, por producto), ¿Cuándo y cómo uso Claude? (mapa de día y hora, por día de la semana, tu día tipo, rachas), ¿Cómo voy en el año? (cómo terminó cada semana, mes a mes, récords) y ¿Cuántas veces llegué al tope? (Fable y sesiones agotadas por semana)
 
 ![El Panel con una cuenta](docs/captura-panel.png)
 
-**Cada pregunta del Panel en su propia ventana.** El botón junto a su título la saca a una ventana flotante; con su X vuelve al Panel:
+**Cada pregunta del Panel en su propia ventana.** El botón junto a su título la saca a una ventana flotante; con su X vuelve al Panel. Esas ventanas se arrastran desde cualquier parte, se angostan (las fichas pasan a más filas y el alto se ajusta solo) y, estiradas desde abajo, agrandan sus gráficos. Arriba del Panel, una pastilla por cada una la trae al frente o la devuelve:
 
 ![Una franja del Panel en su propia ventana](docs/captura-panel-ventana.png)
 

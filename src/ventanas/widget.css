@@ -3814,7 +3814,8 @@ body.parte-pnl .pnl-juntar {
 body.separada-pnl-ahora #pnl-f-ahora,
 body.separada-pnl-semana #pnl-f-semana,
 body.separada-pnl-habitos #pnl-f-habitos,
-body.separada-pnl-anio #pnl-f-anio {
+body.separada-pnl-anio #pnl-f-anio,
+body.separada-pnl-anio2 #pnl-f-anio2 {
   display: none;
 }
 
@@ -3853,7 +3854,8 @@ body.parte-pnl .pnl-franja {
 body.parte-pnl-ahora #pnl-f-ahora,
 body.parte-pnl-semana #pnl-f-semana,
 body.parte-pnl-habitos #pnl-f-habitos,
-body.parte-pnl-anio #pnl-f-anio {
+body.parte-pnl-anio #pnl-f-anio,
+body.parte-pnl-anio2 #pnl-f-anio2 {
   display: grid;
 }
 
@@ -3874,4 +3876,155 @@ body.compacto .tarjeta #hoy-numero:not(:empty)::after {
   font-size: 10.5px;
   font-weight: 600;
   color: var(--texto-suave);
+}
+
+/* ===== El año en dos mitades, y las franjas del Panel que se angostan (0.26.2) ===== */
+/* En el Panel, las dos mitades del año van lado a lado; si una está en su ventana, la otra ocupa todo el ancho */
+.pnl-par {
+  display: flex;
+  gap: 18px;
+  min-width: 0;
+}
+
+.pnl-par > .pnl-franja {
+  flex: 1 1 0;
+  min-width: 0;
+  border-bottom: none;
+  align-content: start;
+}
+
+body.separada-pnl-anio.separada-pnl-anio2 .pnl-par {
+  display: none;
+}
+
+/* En su propia ventana, la mitad se ve sola (la otra no) */
+body.parte-pnl .pnl-par {
+  display: block;
+}
+
+/* La ventana de una franja mide su ancho: si es angosta, las fichas y los gráficos pasan a más filas */
+body.parte-pnl .tablero-graficos {
+  container-type: inline-size;
+}
+
+@container (max-width: 760px) {
+  body.parte-pnl .pnl-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  body.parte-pnl .pnl-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  body.parte-pnl .pnl-mapa { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  body.parte-pnl .pnl-mapa > :first-child { grid-column: 1 / -1; }
+}
+
+@container (max-width: 520px) {
+  body.parte-pnl .pnl-3,
+  body.parte-pnl .pnl-mapa { grid-template-columns: minmax(0, 1fr); }
+}
+
+@container (max-width: 360px) {
+  body.parte-pnl .pnl-4,
+  body.parte-pnl .pnl-2 { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* En la ventana de una franja, el contenido no se estira a lo alto (la ventana mide justo lo que ocupa) */
+body.parte-pnl .pnl,
+body.parte-pnl .pnl-franja {
+  align-content: start;
+  height: auto;
+}
+
+/* La ventana de una franja estirada desde abajo: los gráficos crecen con ella */
+body.parte-pnl .pnl-graf {
+  height: calc(96px + var(--pnl-graf-extra, 0px));
+}
+
+/* La ventana de una franja mide justo su contenido: sin barra de desplazamiento (con escalas como 85% sobraba un pedacito de píxel) */
+body.parte-pnl .tablero-graficos {
+  scrollbar-width: none;
+}
+
+body.parte-pnl .tablero-graficos::-webkit-scrollbar {
+  display: none;
+}
+
+/* Arriba del Panel: las franjas que están en su propia ventana */
+.pnl-afuera {
+  -webkit-app-region: no-drag;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--separador);
+  font-size: 10.5px;
+  color: var(--texto-suave);
+}
+
+.pnl-afuera[hidden],
+body.parte .pnl-afuera {
+  display: none;
+}
+
+.pnl-afuera-titulo {
+  font-weight: 600;
+}
+
+.pnl-afuera-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pnl-afuera-pastilla {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 3px 2px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--borde);
+  background: var(--fila);
+}
+
+.pnl-afuera-nombre,
+.pnl-afuera-volver {
+  border: none;
+  background: none;
+  color: var(--texto);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pnl-afuera-nombre:hover {
+  color: var(--acento);
+}
+
+.pnl-afuera-volver {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border-radius: 50%;
+  color: var(--texto-suave);
+}
+
+.pnl-afuera-volver:hover {
+  color: var(--texto);
+  background: color-mix(in srgb, var(--texto-suave) 22%, transparent);
+}
+
+/* Una fila del Panel sin nada visible (por ejemplo, la de Fable en una cuenta Pro) no deja hueco */
+.pnl-fila:not(:has(> :not([hidden]))) {
+  display: none;
+}
+
+/* La ventana de una franja del Panel se arrastra desde cualquier parte (fichas, números, gráficos, espacios);
+   solo los botones (sacar, volver) siguen siendo botones. Antes solo se podía agarrar el título o el borde. */
+body.parte-pnl .pnl,
+body.parte-pnl .pnl :not(button):not(button *) {
+  -webkit-app-region: drag;
+}
+
+body.parte-pnl .pnl button,
+body.parte-pnl .pnl button * {
+  -webkit-app-region: no-drag;
 }

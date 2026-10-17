@@ -84,7 +84,9 @@ contextBridge.exposeInMainWorld('widget', {
   actualizarAhora: () => ipcRenderer.send('actualizar-ahora'),
   bienvenidaVista: () => ipcRenderer.send('bienvenida-vista'),
   separarParte: (parte) => ipcRenderer.send('separar-parte', parte), // saca una parte del widget a su propia ventana
-  juntarParte: () => ipcRenderer.send('juntar-parte'),               // (desde la ventana de una parte) la devuelve al widget // la bienvenida ya se mostró: no vuelve a salir sola // abre claude.ai → Configuración → Uso en el navegador
+  juntarParte: () => ipcRenderer.send('juntar-parte'),
+  mostrarParte: (parte) => ipcRenderer.send('mostrar-parte', parte),     // (desde el Panel) trae al frente la ventana de esa franja
+  juntarParteDe: (parte) => ipcRenderer.send('juntar-parte-de', parte), // (desde el Panel) devuelve esa franja al Panel               // (desde la ventana de una parte) la devuelve al widget // la bienvenida ya se mostró: no vuelve a salir sola // abre claude.ai → Configuración → Uso en el navegador
 
   // Ajustes: leer los actuales y guardar nuevos (la app responde { ok } o { ok: false, error }).
   obtenerAjustes: () => ipcRenderer.invoke('obtener-ajustes'),
@@ -102,6 +104,7 @@ contextBridge.exposeInMainWorld('widget', {
   redimensionarInicio: (borde, minimos) => ipcRenderer.send('redimensionar-inicio', borde, minimos),
   redimensionarFin: () => ipcRenderer.send('redimensionar-fin'),
   restablecerTamano: () => ipcRenderer.send('restablecer-tamano'),
+  altoDelContenido: (alto) => ipcRenderer.send('alto-del-contenido', alto), // (franja del Panel en su ventana) cuánto alto necesita
 
   // Pide abrir la ventana de inicio de sesión.
   iniciarSesion: () => ipcRenderer.send('iniciar-sesion'),

@@ -124,7 +124,7 @@ const secundarias = new Map(); // id de la cuenta → su ventana propia
 // Partes del widget sacadas a su propia ventana. Cada una es de una cuenta (la de la ventana de donde salió):
 // la clave es "<cuenta>:<parte>", por ejemplo "c2:historial", o "principal:historial" si salió del widget principal.
 // (las del Panel: cada una de sus cuatro franjas)
-const PARTES_DEL_PANEL = ['pnl-ahora', 'pnl-semana', 'pnl-habitos', 'pnl-anio'];
+const PARTES_DEL_PANEL = ['pnl-ahora', 'pnl-semana', 'pnl-habitos', 'pnl-anio', 'pnl-anio2'];
 const PARTES_SEPARABLES = ['historial', 'desglose', 'proyeccion', 'productos', 'chats', ...PARTES_DEL_PANEL];
 const partes = new Map(); // clave → su ventana
 const claveDeParte = (parte, cuentaId) => `${cuentaId || 'principal'}:${parte}`;
@@ -307,13 +307,19 @@ function altoDelResumen() {
 // Lo que el usuario estiró la ventana de cada vista (en píxeles sin escala), por vista: { ancho, alto }.
 // Se guarda en los datos de la app ("tamanos"). La ventana nunca es más chica que la medida base de su vista.
 let tamanosGuardados = {};
-const claveDeTamano = (w, vista = w.vista) => (w.parte ? 'parte-' + w.parte : claveDeVista(vista) + (todasALaVez(w, vista) ? '-todas' : ''));
+// (las franjas del Panel usan otra clave desde 0.26.2: antes su medida base era el ancho completo y lo guardado no sirve)
+const claveDeTamano = (w, vista = w.vista) => (w.parte ? (PARTES_DEL_PANEL.includes(w.parte) ? 'franja-' : 'parte-') + w.parte : claveDeVista(vista) + (todasALaVez(w, vista) ? '-todas' : ''));
 
 // ¿Se puede estirar esa vista a lo alto? Solo a lo ancho en la compacta y en las listas de cuentas (su alto depende de las cuentas).
 const permiteAlto = (w, vista = w.vista) => w.parte !== 'chats' && vista.modo !== 'compacto' && vista.modo !== 'mini' && !todasALaVez(w, vista);
 
 function extrasDeVista(w, vista = w.vista) {
   if (vista.modo === 'mini') return { ancho: 0, alto: 0 }; // el círculo no se estira
+  const inicial = w.parte && TAMANO_INICIAL_DE_PARTE[w.parte];
+  if (inicial && !tamanosGuardados[claveDeTamano(w, vista)]) {
+    const base = medidasDeParte(w.parte, w);
+    return { ancho: Math.max(0, inicial.ancho - base.ancho), alto: Math.max(0, inicial.alto - base.alto) };
+  }
   const guardado = tamanosGuardados[claveDeTamano(w, vista)] || {};
   return {
     ancho: Math.max(0, Math.round(guardado.ancho || 0)),
@@ -351,12 +357,44 @@ const MEDIDAS_DE_PARTE = {
   desglose: { ancho: 300, alto: 230 },
   proyeccion: { ancho: 300, alto: 322 },
   productos: { ancho: 500, alto: 300 },
-  // las franjas del Panel, cada una en su ventana
+  // las franjas del Panel, cada una en su ventana: esto es lo más chico que pueden quedar (abren con TAMANO_INICIAL_DE_PARTE)
+  // (el alto lo pone su contenido: la ventana avisa cuánto necesita)
+  'pnl-ahora': { ancho: 340, alto: 120 },
+  'pnl-semana': { ancho: 380, alto: 120 },
+  'pnl-habitos': { ancho: 380, alto: 120 },
+  'pnl-anio': { ancho: 320, alto: 120 },
+  'pnl-anio2': { ancho: 320, alto: 120 },
+};
+// Con qué tamaño abren las franjas del Panel la primera vez (o al volver a su tamaño con doble clic en un borde)
+const TAMANO_INICIAL_DE_PARTE = {
   'pnl-ahora': { ancho: 900, alto: 150 },
   'pnl-semana': { ancho: 900, alto: 290 },
   'pnl-habitos': { ancho: 900, alto: 320 },
-  'pnl-anio': { ancho: 900, alto: 430 },
+  'pnl-anio': { ancho: 460, alto: 440 },
+  'pnl-anio2': { ancho: 460, alto: 440 },
 };
+
+// La ventana de una franja del Panel avisa cuánto alto necesita (en px de la página) para que su contenido quepa entero.
+// La ventana mide eso más lo que el usuario la estiró de más desde abajo o arriba ("extraAlto", que agranda los gráficos):
+// al angostarla, las fichas pasan a más filas y crece sola; al ensancharla se achica; nunca queda con barra de desplazamiento.
+const extraAltoDeParte = (w) => Math.max(0, Math.round((tamanosGuardados[claveDeTamano(w)] || {}).extraAlto || 0));
+function ajustarAltoDeParte(w) {
+  if (w.redimension || !estaViva(w) || !w.altoNecesario) return;
+  const limites = w.ventana.getBounds();
+  const area = screen.getDisplayMatching(limites).workArea;
+  const extraAlto = extraAltoDeParte(w);
+  const alto = Math.min(Math.ceil((w.altoNecesario + extraAlto) * escalaActual), area.height + 2 * margen()); // (hacia arriba: con escalas como 85% no falta ni un pedacito de píxel)
+  if (alto === limites.height) return;
+  w.ventana.setBounds({ ...limites, height: alto });
+  setTimeout(() => acomodarSinTapar(w, true), 50); // (si al crecer quedó encima de otra ventana de la app, se corre)
+  const base = medidasBase(w);
+  tamanosGuardados[claveDeTamano(w)] = {
+    ancho: Math.max(0, Math.round(limites.width / escalaActual) - 2 * MARGEN - base.ancho),
+    alto: Math.max(0, Math.round(alto / escalaActual) - 2 * MARGEN - base.alto),
+    extraAlto,
+  };
+  almacen.guardar({ tamanos: tamanosGuardados });
+}
 // "w": la ventana de esa parte. Si muestra todas las cuentas a la vez, el desglose y la proyección crecen con ellas.
 function medidasDeParte(parte, w) {
   if (parte === 'chats') return { ancho: 300, alto: CHATS_RELLENO + CHATS_CABECERA + CHATS_FILA * Math.max(1, chatsActuales.length) };
@@ -919,10 +957,19 @@ function moverRedimension(w) {
       y = inicio.y + inicio.height - height;
     }
   }
+  // Una franja del Panel: a lo alto, su contenido más lo que se estiró de más desde abajo o arriba (nunca menos que el contenido)
+  let extraAlto = null;
+  if (w.altoNecesario) {
+    extraAlto = extraAltoDeParte(w);
+    if (borde.includes('s') || borde.includes('n')) extraAlto = Math.max(0, Math.round(height / escalaActual) - w.altoNecesario);
+    height = Math.min(Math.ceil((w.altoNecesario + extraAlto) * escalaActual), maxAlto);
+    if (borde.includes('n')) y = inicio.y + inicio.height - height;
+  }
 
   tamanosGuardados[clave] = {
     ancho: Math.round((width - minAncho) / escalaActual),
     alto: Math.round((height - minAlto) / escalaActual),
+    ...(extraAlto !== null ? { extraAlto } : {}),
   };
   w.ventana.setBounds({ x, y, width, height });
   enviarApariencia(w);
@@ -951,6 +998,7 @@ function restablecerTamano(w) {
   delete tamanosGuardados[claveDeTamano(w)];
   almacen.guardar({ tamanos: tamanosGuardados });
   reajustarLaVentana(w);
+  ajustarAltoDeParte(w); // (una franja del Panel: a la medida de su contenido, sin lo estirado de más)
   enviarApariencia(w);
 }
 
@@ -2788,6 +2836,12 @@ if (!app.requestSingleInstanceLock()) {
     ipcMain.on('redimensionar-inicio', (evento, borde, minimos) => empezarRedimension(ventanaDelEvento(evento), borde, minimos));
     ipcMain.on('redimensionar-fin', (evento) => terminarRedimension(ventanaDelEvento(evento)));
     ipcMain.on('restablecer-tamano', (evento) => restablecerTamano(ventanaDelEvento(evento)));
+    ipcMain.on('alto-del-contenido', (evento, alto) => {
+      const w = ventanaDelEvento(evento);
+      if (!w || !PARTES_DEL_PANEL.includes(w.parte) || !Number.isFinite(alto) || alto <= 0 || alto > 5000) return;
+      w.altoNecesario = Math.ceil(alto);
+      ajustarAltoDeParte(w);
+    });
     ipcMain.on('alternar-orientacion', (evento) => {
       const w = ventanaDelEvento(evento);
       // La orientación solo se nota en la vista normal; en las otras no hay nada que cambiar.
@@ -2801,6 +2855,18 @@ if (!app.requestSingleInstanceLock()) {
     });
     ipcMain.on('separar-parte', (evento, parte) => separarParte(String(parte), ventanaDelEvento(evento).cuentaId));
     ipcMain.on('juntar-parte', (evento) => { const w = ventanaDelEvento(evento); if (w.parte) juntarParte(w.clave); });
+    // (desde el Panel) una franja que está en su propia ventana: traer esa ventana al frente, o devolverla al Panel
+    ipcMain.on('mostrar-parte', (evento, parte) => {
+      if (!PARTES_DEL_PANEL.includes(parte)) return;
+      const w = partes.get(claveDeParte(parte, ventanaDelEvento(evento).cuentaId));
+      if (!w || !estaViva(w)) return;
+      w.ventana.show();
+      w.ventana.moveTop();
+      w.ventana.focus();
+    });
+    ipcMain.on('juntar-parte-de', (evento, parte) => {
+      if (PARTES_DEL_PANEL.includes(parte)) juntarParte(claveDeParte(parte, ventanaDelEvento(evento).cuentaId));
+    });
     ipcMain.on('bienvenida-vista', () => { if (!almacen.leer().bienvenidaVista) almacen.guardar({ bienvenidaVista: true }); });
     ipcMain.handle('exportar-historial', (evento) => exportarHistorial(ventanaDelEvento(evento), BrowserWindow.fromWebContents(evento.sender)));
     ipcMain.handle('buscar-actualizacion', () => buscarActualizacionAhora());
